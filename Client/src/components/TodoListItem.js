@@ -1,18 +1,22 @@
 import React from "react"
-import { View, Text, CheckBox, StyleSheet } from "react-native"
+import { View, Text, StyleSheet } from "react-native"
+import CheckBox from '@react-native-community/checkbox'
 
-function TodoListItem() {
+function TodoListItem({ style }) {
 
   const [isSelected, setSelection] = React.useState(false);
 
   return (
-    <View style={styles.container}>
-      <CheckBox
-        value={isSelected}
-        onValueChange={setSelection}
-        style={styles.checkbox}
-      />
-      <Text style={styles.text}>Todo List Item</Text>
+    <View style={style}>
+      <View style={styles.container}>
+        {/* <CheckBox
+          disabled={false}
+          value={isSelected}
+          onValueChange={setSelection}
+          style={styles.checkbox}
+        /> */}
+        <Text style={styles.text}>Todo List Item</Text>
+      </View>
     </View>
   )
 }
@@ -20,13 +24,13 @@ function TodoListItem() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    paddingVertical: 15,
+    paddingVertical: 30,
     paddingHorizontal: 10,
     backgroundColor: "#fff",
-    marginHorizontal: 8,
+    // marginHorizontal: 8,
     alignItems: "center",
     borderRadius: 14,
-    marginBottom: 6
+    // marginBottom: 6
   },
   checkbox: {
     marginRight: 8

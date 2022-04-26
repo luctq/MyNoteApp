@@ -1,7 +1,10 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import ModalDropdown from "react-native-modal-dropdown";
-export default function DropDown() {
+import AntIcons from 'react-native-vector-icons/AntDesign'
+
+import RecycleBin from '../screens/RecycleBin'
+
+export default function DropDown({ style }) {
   const handleSelect = (index, value) => {
       console.log('index' + index);
       console.log('value' + value);
@@ -12,8 +15,13 @@ export default function DropDown() {
       dropdownStyle={styles.dropdown}
       dropdownTextStyle={styles.dropdownText}
       onSelect={handleSelect}
+      style={style}
     >
-      <Text>Folder</Text>
+      <AntIcons 
+        name="folderopen"
+        size={25}
+        color="#000"
+      />
     </ModalDropdown>
   );
 }

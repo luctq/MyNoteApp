@@ -2,19 +2,21 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function FolderListItem() {
+export default function FolderListItem({ style }) {
   const [title, setTitle] = useState("Tiêu đề");
   const [count, setCount] = useState(0);
   return (
-    <View style={styles.container}>
-      <Ionicons
-        name="folder-open-sharp"
-        size={40}
-        color="orange"
-        style={styles.icon}
-      />
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.count}>{count}</Text>
+    <View style={style}>
+      <View style={styles.container}>
+        <Ionicons
+          name="folder-open-sharp"
+          size={40}
+          color="orange"
+          style={styles.icon}
+        />
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.count}>{count}</Text>
+      </View>
     </View>
   );
 }
@@ -24,11 +26,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#FFFFFF",
     borderRadius: 15,
-    width: "80%",
+    // width: "80%",
     height: 80,
     paddingLeft: 10,
     paddingRight: 10,
-    marginTop: 20,
+    // marginTop: 20,
   },
   icon: {
     margin: 10,

@@ -3,19 +3,21 @@ import React, {useState} from 'react';
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 
-export default function SearchBar() {
+export default function SearchBar({style}) {
     const [textSearch, setTextSearch] = useState("");
   return (
-    <View style={styles.searchBar}>
-      <Ionicons name="search" size={25} color="black" style={styles.icon} />
-      <TextInput
-        value={textSearch}
-        placeholder="Tìm kiếm ghi chú"
-        onChangeText={(text) => setTextSearch(text)}
-        placeholderTextColor={"gray"}
-        style={styles.searchInput}
-        clearTextOnFocus={true}
-      />
+    <View style={style}>
+      <View style={styles.searchBar}>
+        <Ionicons name="search" size={25} color="black" style={styles.icon} />
+        <TextInput
+          value={textSearch}
+          placeholder="Tìm kiếm ghi chú"
+          onChangeText={(text) => setTextSearch(text)}
+          placeholderTextColor={"gray"}
+          style={styles.searchInput}
+          clearTextOnFocus={true}
+        />
+      </View>
     </View>
   );
 }
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#EDEDED",
     borderRadius: 25,
-    width: "80%",
+    // width: "80%",
   },
   searchInput: {
     paddingLeft: 10,
@@ -35,7 +37,7 @@ const styles = StyleSheet.create({
     height: 50,
     color: "gray",
     borderWidth: 0,
-    outlineWidth: 0,
+    // outlineWidth: 0,
     width: "80%",
     fontSize: 18,
   },
