@@ -1,22 +1,24 @@
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import AntIcons from 'react-native-vector-icons/AntDesign'
 
-function ShareButton() {
+function ShareButton({ style, handlePress }) {
 
   return (
-    <Pressable style={styles.container}>
-      <AntIcons 
-        name="sharealt"
-        size={25}
-        color="#000"
-      />
-    </Pressable>
+    <View style={style}>
+      <Pressable style={styles.container} onPress={handlePress}>
+        <AntIcons 
+          name="sharealt"
+          size={25}
+          color="#000"
+        />
+      </Pressable>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
   }
 })
 

@@ -1,22 +1,24 @@
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import EntypoIcons from 'react-native-vector-icons/Entypo'
 
-function ThreeDotButton() {
+function ThreeDotButton({ style }) {
 
   return (
-    <Pressable style={styles.container}>
-      <EntypoIcons 
-        name="dots-three-vertical"
-        size={25}
-        color="#000"
-      />
-    </Pressable>
+    <View style={style}>
+      <Pressable style={styles.container}>
+        <EntypoIcons 
+          name="dots-three-vertical"
+          size={25}
+          color="#000"
+        />
+      </Pressable>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
   }
 })
 

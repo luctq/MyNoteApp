@@ -1,3 +1,4 @@
+import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
 
@@ -5,8 +6,11 @@ import SearchBar from '../components/SearchBar'
 import NoteListItem from '../components/NoteListItem'
 import AddNewNoteButton from '../components/AddNewNoteButton'
 import DeleteButton from '../components/DeleteButton'
+import NewFolderModal from '../components/NewFolderModal'
 
 function Folder () {
+
+  const [isOpen, setIsOpen] = React.useState(false)
 
   const renderItem = (data, rowMap) => (
     <SwipeRow
@@ -30,7 +34,8 @@ function Folder () {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
       />
-      <AddNewNoteButton style={styles.addNewNoteButton}/>
+      <NewFolderModal isOpen={isOpen} onClosed={() => setIsOpen(false)} />
+      <AddNewNoteButton style={styles.addNewNoteButton} handelPress={() => setIsOpen(!isOpen)}/>
     </View>
   )
 }
@@ -68,7 +73,6 @@ const styles = StyleSheet.create({
   deleteButton: {
     alignItems: 'flex-end',
     marginTop: 23,
-    justifyContent: 'center'
   },
   noteListItem: {
     marginTop: 20

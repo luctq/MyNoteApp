@@ -1,16 +1,18 @@
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import AntIcons from 'react-native-vector-icons/AntDesign'
 
-function ChangeBackgroundButton() {
+function ChangeBackgroundButton({ style }) {
 
   return (
-    <Pressable>
-      <AntIcons 
-        name="skin"
-        size={25}
-        color="black"
-      />
-    </Pressable>
+    <View style={style}>
+      <Pressable>
+        <AntIcons 
+          name="skin"
+          size={25}
+          color="black"
+        />
+      </Pressable>
+    </View>
   )
 }
 

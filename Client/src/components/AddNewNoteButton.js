@@ -2,9 +2,9 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
-export default function AddNewNoteButton({ style }) {
+export default function AddNewNoteButton({ style, handlePress }) {
   return (
-    <TouchableOpacity style={style}>
+    <TouchableOpacity style={style} onPress={handlePress}>
       <AntDesign
         name="pluscircle"
         color="#FCC105"
