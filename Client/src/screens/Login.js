@@ -11,9 +11,17 @@ import {
   TouchableOpacity,
 } from "react-native";
 var screen = Dimensions.get("window");
-export default function Login() {
+export default function Login({login}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  function handleLogin() {
+    // check email, password code before call login().... 
+
+    // login(email, password);
+    // navigation.navigate(....)
+  }
+
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={require("../../assets/logo.png")} />
