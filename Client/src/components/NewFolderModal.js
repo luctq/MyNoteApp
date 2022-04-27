@@ -14,6 +14,7 @@ export default function NewFolderModal(props) {
   const openModal = () => {
     ref.current.open();
   };
+  const inputRef = useRef()
   return (
     <Modal
       ref={ref}
@@ -25,6 +26,8 @@ export default function NewFolderModal(props) {
     >
       <Text style={{ fontSize: 20, fontWeight: 'bold'}}>Thư mục mới</Text>
       <TextInput
+        ref={inputRef}
+        onLayout={() => inputRef.current.focus()}
         autoFocus={true}
         style={styles.input}
         placeholder="Thư mục ghi chú"
