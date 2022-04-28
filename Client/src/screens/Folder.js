@@ -15,9 +15,13 @@ function Folder({ navigation }) {
       rightOpenValue={-80}
       leftOpenValue={0}
       disableRightSwipe={true}
+      style={styles.noteRow}
     >
       <DeleteButton style={styles.deleteButton}/>
-      <NoteListItem style={styles.noteListItem} onNoteListItemPress={handleNoteListItemPress}/>
+      <NoteListItem 
+        style={styles.noteListItem} 
+        onNoteListItemPress={handleNoteListItemPress}
+      />
     </SwipeRow>
   )
   const keyExtractor = (item) => item.id
@@ -79,12 +83,17 @@ const styles = StyleSheet.create({
     bottom: 58,
     right: 25
   },
+  noteRow: {
+    marginTop: 20,
+  },
   deleteButton: {
-    alignItems: 'flex-end',
-    marginTop: 23,
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   noteListItem: {
-    marginTop: 20
+
   },
   backButton: {
     position: 'absolute',

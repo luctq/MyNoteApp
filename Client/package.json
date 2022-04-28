@@ -14,6 +14,8 @@
     "@react-native-community/checkbox": "^0.5.12",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.2",
+    "@reduxjs/toolkit": "^1.8.1",
+    "axios": "^0.27.2",
     "expo": "~44.0.0",
     "expo-image-picker": "^12.0.2",
     "expo-status-bar": "~1.2.0",
@@ -27,7 +29,11 @@
     "react-native-pell-rich-editor": "^1.8.8",
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-vector-icons": "^9.1.0",
-    "react-native-web": "0.17.1"
+    "react-native-web": "0.17.1",
+    "react-redux": "^8.0.1",
+    "redux": "^4.2.0",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

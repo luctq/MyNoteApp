@@ -1,17 +1,18 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { TouchableOpacity, StyleSheet, View, Text } from "react-native";
 import AntIcons from 'react-native-vector-icons/AntDesign'
 
 function DeleteButton({ style }) {
 
   return (
     <View style={style}>
-      <Pressable style={styles.container}>
+      <Text>Left</Text>
+      <TouchableOpacity style={styles.container}>
         <AntIcons 
           name="delete"
           size={25}
           color="#fff"
         />
-      </Pressable>
+      </TouchableOpacity>
     </View>
   )
 }
@@ -20,8 +21,10 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fb4039",
     padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 50,
-    maxWidth: 150,
+    right: 0
   }
 })
 

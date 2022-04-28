@@ -26,7 +26,7 @@ const note = createSlice({
   },
 });
 
-const { addNote, deleteNote, editNote } = folder.actions;
+const { addNote, deleteNote, editNote } = note.actions;
 
 export const createNewNote = (info) => (dispatch) => {
   dispatch(addNote(info));
