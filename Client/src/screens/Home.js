@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
+import Constants from 'expo-constants'
 
 import SettingButton from '../components/SettingButton'
 import SearchBar from '../components/SearchBar'
@@ -57,9 +58,11 @@ function Home({ navigation }) {
         onSettingPress={handleSettingPress} 
       />
       <View style={styles.headerIcon}>
-        <TouchableOpacity onPress={() => handlePressFolderIcon()}>
-          <AntIcons name='folderopen' size={25} color='#000' />
-        </TouchableOpacity>
+        <View style={styles.folderButton}>
+          <TouchableOpacity onPress={() => handlePressFolderIcon()}>
+            <AntIcons name='folderopen' size={25} color='#000' />
+          </TouchableOpacity>
+        </View>
         <CheckButton style={styles.checkButton} />
       </View>
       <SearchBar style={styles.searchBar} />
@@ -99,17 +102,18 @@ const styles = StyleSheet.create({
   },
   settingButton: {
     position: 'absolute',
-    top: 20,
-    right: 12,
+    top: Constants.statusBarHeight + 5,
+    right: 15,
+    zIndex: 1
   },
   headerIcon: {
     flexDirection: 'row',
-    position: 'absolute',
-    top: 32,
-    left: 150,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Constants.statusBarHeight + 10,
   },
   searchBar: {
-    marginTop: 100,
+    marginTop: 40,
   },
   folderButton: {
     paddingHorizontal: 8,

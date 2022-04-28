@@ -10,6 +10,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
+import Constants from 'expo-constants'
 
 import BackButton from "../components/BackButton";
 
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 20,
+    top: Constants.statusBarHeight + 5,
     left: 15
   },
 });

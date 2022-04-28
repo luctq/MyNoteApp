@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React from 'react'
+import Constants from 'expo-constants'
 
 import BackButton from '../components/BackButton'
 
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 20,
+    top: Constants.statusBarHeight + 5,
     left: 15
   },
 })

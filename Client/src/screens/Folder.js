@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
+import Constants from 'expo-constants'
 
 import SearchBar from '../components/SearchBar'
 import NoteListItem from '../components/NoteListItem'
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 35,
     fontWeight: '400', 
-    marginTop: 60
+    marginTop: Constants.statusBarHeight + 50
   },
   note: {
     fontSize: 15,
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 20,
+    top: Constants.statusBarHeight + 5,
     left: 15
   },
 })

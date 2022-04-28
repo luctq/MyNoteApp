@@ -1,4 +1,4 @@
-import { TouchableOpacity, StyleSheet, View, Text } from "react-native";
+import { TouchableOpacity, StyleSheet, View, Text } from 'react-native'
 import AntIcons from 'react-native-vector-icons/AntDesign'
 
 function DeleteButton({ style }) {

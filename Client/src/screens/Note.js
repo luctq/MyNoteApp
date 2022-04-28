@@ -12,6 +12,7 @@ import {
   RichToolbar,
 } from 'react-native-pell-rich-editor'
 import * as ImagePicker from 'expo-image-picker'
+import Constants from 'expo-constants'
 
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
@@ -135,8 +136,8 @@ const styles = StyleSheet.create({
   headerIcon: {
     flexDirection: 'row',
     position: 'absolute',
-    top: 25,
-    right: 12,
+    top: Constants.statusBarHeight + 5,
+    right: 15,
   },
   shareButton: {
     paddingHorizontal: 10,
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
   },
   threeDotButton: {},
   titleNote: {
-    marginTop: 60,
+    marginTop: Constants.statusBarHeight + 50,
     fontSize: 22,
     fontWeight: 'bold',
   },
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 20,
+    top: Constants.statusBarHeight + 5,
     left: 15
   },
 })
