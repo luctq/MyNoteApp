@@ -6,11 +6,9 @@ import SearchBar from '../components/SearchBar'
 import NoteListItem from '../components/NoteListItem'
 import AddNewNoteButton from '../components/AddNewNoteButton'
 import DeleteButton from '../components/DeleteButton'
-import NewFolderModal from '../components/NewFolderModal'
+import BackButton from '../components/BackButton'
 
-function Folder () {
-
-  const [isOpen, setIsOpen] = React.useState(false)
+function Folder({ navigation }) {
 
   const renderItem = (data, rowMap) => (
     <SwipeRow
@@ -18,15 +16,24 @@ function Folder () {
       leftOpenValue={0}
       disableRightSwipe={true}
     >
-      <DeleteButton style={styles.deleteButton} />
-      <NoteListItem style={styles.noteListItem}/>
+      <DeleteButton style={styles.deleteButton}/>
+      <NoteListItem style={styles.noteListItem} onNoteListItemPress={handleNoteListItemPress}/>
     </SwipeRow>
   )
-
   const keyExtractor = (item) => item.id
+  const handleBackPress = () => {
+    navigation.goBack()
+  }
+  const handleNoteListItemPress = () => {
+    navigation.navigate('Note')
+  }
+  const handleAddNewNotePress = () => {
+    navigation.navigate('Note')
+  }
 
   return (
     <View style={styles.container}>
+      <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
       <Text style={styles.header}>Thư mục</Text>
       <SearchBar style={styles.searchBar} />
       <SwipeListView 
@@ -34,8 +41,10 @@ function Folder () {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
       />
-      <NewFolderModal isOpen={isOpen} onClosed={() => setIsOpen(false)} />
-      <AddNewNoteButton style={styles.addNewNoteButton} handelPress={() => setIsOpen(!isOpen)}/>
+      <AddNewNoteButton 
+        style={styles.addNewNoteButton} 
+        onAddNewNotePress={handleAddNewNotePress}
+      />
     </View>
   )
 }
@@ -49,7 +58,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 35,
     fontWeight: '400', 
-    marginTop: 40
+    marginTop: 60
   },
   note: {
     fontSize: 15,
@@ -76,7 +85,12 @@ const styles = StyleSheet.create({
   },
   noteListItem: {
     marginTop: 20
-  }
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 15
+  },
 })
 
 export default Folder

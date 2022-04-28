@@ -35,7 +35,7 @@ export default function ShareFormModal(props) {
         <Pressable style={styles.button_cancel} onPress={() => ref.current.close()}>
           <Text style={{ color: "black" }}>Hủy</Text>
         </Pressable>
-        <Pressable style={styles.button_ok} onPress={() => console.log("OK")}>
+        <Pressable style={styles.button_ok}>
           <Text style={{ color: "white" }}>OK</Text>
         </Pressable>
       </View>

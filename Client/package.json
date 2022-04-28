@@ -12,6 +12,8 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-native-community/checkbox": "^0.5.12",
+    "@react-navigation/native": "^6.0.10",
+    "@react-navigation/native-stack": "^6.6.2",
     "expo": "~44.0.0",
     "expo-image-picker": "^12.0.2",
     "expo-status-bar": "~1.2.0",

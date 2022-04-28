@@ -2,7 +2,7 @@
 Cách sử dụng component:
 const [isOpenDropDown, setIsOpenDropDown] = useState(false);
 const handlePressFolderIcon = () => {
-   setIsOpenDropDown(!isOpenDropDown)
+  setIsOpenDropDown(!isOpenDropDown)
 }
 <DropDownOfFolder isOpen={isOpenDropDown} setIsOpen={() => handlePressFolderIcon()}/>
 <TouchableOpacity onPress={() => handlePressFolderIcon()}>
@@ -13,29 +13,35 @@ const handlePressFolderIcon = () => {
   />
 </TouchableOpacity>
 */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  Pressable,
   TouchableWithoutFeedback,
   Dimensions,
   StyleSheet
 } from "react-native";
+
 import NewFolderModal from "./NewFolderModal";
+
 const screen = Dimensions.get('window');
+
+
 export default function DropDownOfFolder(props) {
+
   const [isOpenModal, setIsOpenModal] = useState(false);
   const options = ["Thùng rác", "Thư mục mới"]
+
   const handleSelect = (option) => {
     if (option === "Thư mục mới") {
       props.setIsOpen(false);
       setIsOpenModal(true);
     } else if (option == "Thùng rác") {
-        console.log(option);
+      props.onRecycleBinPress()
     } 
   };
+  
   if (props.isOpen) {
     return (
       <TouchableWithoutFeedback onPress={() => props.setIsOpen(false)}>
@@ -75,7 +81,7 @@ export default function DropDownOfFolder(props) {
 }
 const styles = StyleSheet.create({
   container: {
-    display: "none",
+    // display: "none",
     zIndex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
     position: "absolute",

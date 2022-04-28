@@ -1,13 +1,15 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import { StyleSheet, Text, View, Pressable } from "react-native";
+import { useState } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function FolderListItem({ style }) {
+export default function FolderListItem({ style, onFolderListItemPress }) {
+
   const [title, setTitle] = useState("Tiêu đề");
   const [count, setCount] = useState(0);
+  
   return (
     <View style={style}>
-      <View style={styles.container}>
+      <Pressable style={styles.container} onPress={onFolderListItemPress}>
         <Ionicons
           name="folder-open-sharp"
           size={40}
@@ -16,7 +18,7 @@ export default function FolderListItem({ style }) {
         />
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.count}>{count}</Text>
-      </View>
+      </Pressable>
     </View>
   );
 }

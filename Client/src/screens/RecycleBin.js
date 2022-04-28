@@ -2,16 +2,22 @@ import { View, Text, StyleSheet } from 'react-native'
 
 import SearchBar from '../components/SearchBar'
 import NoteListItem from '../components/NoteListItem'
+import BackButton from '../components/BackButton'
 
-function RecycleBin () {
+function RecycleBin ({ navigation }) {
+
+  const handleBackPress = () => {
+    navigation.goBack()
+  }
 
   return (
     <View style={styles.container}>
+      <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
       <Text style={styles.header}>Thùng rác</Text>
       <Text style={styles.note}>Các ghi chú được giữ trong thùng rác trong 30 ngày trước khi bị xóa vĩnh viễn</Text>
       <SearchBar style={styles.searchBar} />
-      <NoteListItem />
-      <NoteListItem />
+      <NoteListItem style={styles.noteListItem}/>
+      <NoteListItem style={styles.noteListItem}/>
     </View>
   )
 }
@@ -25,7 +31,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 35,
     fontWeight: '400', 
-    marginTop: 40
+    marginTop: 60
   },
   note: {
     fontSize: 15,
@@ -39,6 +45,14 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   searchBar: {
+    marginTop: 20
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 15
+  },
+  noteListItem: {
     marginTop: 20
   }
 })

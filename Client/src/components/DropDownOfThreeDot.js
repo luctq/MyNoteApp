@@ -25,6 +25,7 @@ import {
 import SetTimeForm from "./SetTimeForm";
 const screen = Dimensions.get('window');
 export default function DropDownOfThreeDot(props) {
+
   const [isOpenModal, setIsOpenModal] = useState(false);
   const options = [
     "Nhắc nhở",
@@ -86,7 +87,7 @@ export default function DropDownOfThreeDot(props) {
 }
 const styles = StyleSheet.create({
   container: {
-    display: "none",
+    // display: "none",
     zIndex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
     position: "absolute",
@@ -99,11 +100,14 @@ const styles = StyleSheet.create({
   }, 
   modal: {
     backgroundColor: "#fefefe",
-              borderRadius: 20,
-              height: 250,
-              width: 300,
-              paddingLeft: 20,
+    borderRadius: 20,
+    height: 250,
+    width: 300,
+    paddingLeft: 20,
   },
-  optionStyle: { fontSize: 21, padding: 10, height: 50 }
-}
-)
+  optionStyle: { 
+    fontSize: 21, 
+    padding: 10, 
+    height: 50 
+  }
+})

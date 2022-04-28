@@ -1,17 +1,17 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
 import EntypoIcons from 'react-native-vector-icons/Entypo'
 
-function ThreeDotButton({ style }) {
+function ThreeDotButton({ style, onButtonPress }) {
 
   return (
     <View style={style}>
-      <Pressable style={styles.container}>
+      <TouchableOpacity style={styles.container} onPress={onButtonPress}>
         <EntypoIcons 
           name="dots-three-vertical"
           size={25}
           color="#000"
         />
-      </Pressable>
+      </TouchableOpacity>
     </View>
   )
 }

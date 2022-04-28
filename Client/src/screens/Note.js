@@ -1,50 +1,49 @@
-import React from "react";
+import { useState, useRef, useCallback } from 'react'
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableOpacity,
-} from "react-native";
+} from 'react-native'
 import {
   actions,
   RichEditor,
   RichToolbar,
-} from "react-native-pell-rich-editor";
-import * as ImagePicker from "expo-image-picker";
+} from 'react-native-pell-rich-editor'
+import * as ImagePicker from 'expo-image-picker'
 
-import ShareButton from "../components/ShareButton";
-import ChangeBackgroundButton from "../components/ChangeBackgroundButton";
-import ThreeDotButton from "../components/ThreeDotButton";
-import ShareFormModal from "../components/ShareFormModal";
-import DropDownOfThreeDot from "../components/DropDownOfThreeDot";
-import EntypoIcons from "react-native-vector-icons/Entypo";
-function Note() {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [noteTitle, setNoteTitle] = React.useState("Ghi chu 1");
-  const [noteContent, setNoteContent] = React.useState("");
-  const [isFocusContent, setIsFocusContent] = React.useState(false);
-  const [heightEditor, setHeightEditor] = React.useState(520);
-  const [isOpenDropDown, setIsOpenDropDown] = React.useState(false);
-  const handlePressFolderIcon = () => {
-    console.log("hello");
-    setIsOpenDropDown(!isOpenDropDown);
-  };
-  const richText = React.useRef();
-  const editorView = React.useRef();
+import ShareButton from '../components/ShareButton'
+import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
+import ThreeDotButton from '../components/ThreeDotButton'
+import ShareFormModal from '../components/ShareFormModal'
+import DropDownOfThreeDot from '../components/DropDownOfThreeDot'
+import BackButton from '../components/BackButton'
+
+
+function Note({ navigation }) {
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [noteTitle, setNoteTitle] = useState('Ghi chu 1')
+  const [noteContent, setNoteContent] = useState('')
+  const [heightEditor, setHeightEditor] = useState(520)
+  const [isOpenDropDown, setIsOpenDropDown] = useState(false)
+  const richText = useRef()
+  const editorView = useRef()
 
   const handleNoteTitleChange = (noteTitle) => {
-    setNoteTitle(noteTitle);
-  };
-
+    setNoteTitle(noteTitle)
+  }
   const handleNoteContentChange = (noteContent) => {
-    setNoteContent(noteContent);
-  };
-
-  const handlePressAddImage = React.useCallback(async () => {
+    setNoteContent(noteContent)
+  }
+  const handlePressFolderIcon = () => {
+    setIsOpenDropDown(!isOpenDropDown)
+  }
+  const handleBackPress = () => {
+    navigation.goBack()
+  }
+  const handlePressAddImage = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -52,14 +51,15 @@ function Note() {
       quality: 1,
       presentationStyle: 0, //tránh bị out
       base64: true,
-    });
+    })
     if (!result.cancelled) {
-      richText.current.insertImage("data:image/png;base64, " + result.base64);
+      richText.current.insertImage('data:image/pngbase64, ' + result.base64)
     }
-  });
+  })
 
   return (
     <View style={styles.container}>
+      <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
       <DropDownOfThreeDot
         isOpen={isOpenDropDown}
         setIsOpen={() => handlePressFolderIcon()}
@@ -71,14 +71,10 @@ function Note() {
           handlePress={() => setIsOpen(!isOpen)}
         />
         <ChangeBackgroundButton style={styles.changeBackgroundButton} />
-        <TouchableOpacity
-          onPress={() => handlePressFolderIcon()}
-        >
-          <EntypoIcons name="dots-three-vertical" size={25} color="#000" />
-        </TouchableOpacity>
+        <ThreeDotButton onButtonPress={handlePressFolderIcon} />
       </View>
       <TextInput
-        placeholder="Write title..."
+        placeholder='Write title...'
         value={noteTitle}
         onChangeText={handleNoteTitleChange}
         style={styles.titleNote}
@@ -101,7 +97,7 @@ function Note() {
               <Text style={[{ color: tintColor }]}>H1</Text>
             ),
           }}
-          style={{ backgroundColor: "#f7f7f7" }}
+          style={{ backgroundColor: '#f7f7f7' }}
           onPressAddImage={handlePressAddImage}
         />
         <ScrollView
@@ -115,10 +111,10 @@ function Note() {
             ref={richText}
             initialContentHTML={noteContent}
             onChange={(text) => {
-              handleNoteContentChange(text);
+              handleNoteContentChange(text)
             }}
-            editorStyle={{ backgroundColor: "#f7f7f7" }}
-            placeholder="Type something here..."
+            editorStyle={{ backgroundColor: '#f7f7f7' }}
+            placeholder='Type something here...'
             // style={{ borderColor: 'red', borderWidth: 1 }}
             onFocus={() => setHeightEditor(320)}
             onBlur={() => setHeightEditor(520)}
@@ -126,19 +122,19 @@ function Note() {
         </ScrollView>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#f7f7f7",
+    backgroundColor: '#f7f7f7',
     flex: 1,
     paddingHorizontal: 25,
-    marginTop: 10,
+    // marginTop: 10,
   },
   headerIcon: {
-    flexDirection: "row",
-    position: "absolute",
+    flexDirection: 'row',
+    position: 'absolute',
     top: 25,
     right: 12,
   },
@@ -152,13 +148,18 @@ const styles = StyleSheet.create({
   titleNote: {
     marginTop: 60,
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   noteContent: {},
   editorView: {
     // borderColor: 'green',
     // borderWidth: 2,
   },
-});
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 15
+  },
+})
 
-export default Note;
+export default Note

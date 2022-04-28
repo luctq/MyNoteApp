@@ -1,17 +1,17 @@
 import { TouchableOpacity, StyleSheet, View } from "react-native";
-import AntIcons from 'react-native-vector-icons/AntDesign'
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-function CheckButton({ style }) {
+function BackButton({ style, onBackPress }) {
 
   return (
     <View style={style}>
       <TouchableOpacity 
         style={styles.container} 
-        onPress={() => alert('Check Icon Press!')}
+        onPress={onBackPress}
       >
-        <AntIcons 
-          name="checksquareo"
-          size={25}
+        <Ionicons 
+          name="arrow-back"
+          size={30}
           color="#000"
         />
       </TouchableOpacity>
@@ -25,4 +25,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default CheckButton;
+export default BackButton;

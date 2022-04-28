@@ -10,15 +10,26 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
+
+import BackButton from "../components/BackButton";
+
 var screen = Dimensions.get("window");
-export default function Register() {
+
+
+export default function Register({ navigation }) {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
- 
+
+  const handleBackPress = () => {
+    navigation.goBack()
+  }
+
   return (
     <View style={styles.container}>
+      <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
       <Image style={styles.image} source={require("../../assets/logo.png")} />
- 
+
       <StatusBar style="auto" />
       <Text style={styles.title}>Welcome to MyNote</Text>
       <View style={styles.inputView}>
@@ -29,7 +40,7 @@ export default function Register() {
           onChangeText={(email) => setEmail(email)}
         />
       </View>
- 
+
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
@@ -39,7 +50,7 @@ export default function Register() {
           onChangeText={(password) => setPassword(password)}
         />
       </View>
- 
+
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
@@ -56,7 +67,7 @@ export default function Register() {
     </View>
   );
 }
- 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -74,7 +85,7 @@ const styles = StyleSheet.create({
     height: 120,
     width: 120
   },
- 
+
   inputView: {
     backgroundColor: "#F0F0F0",
     borderRadius: 30,
@@ -82,20 +93,19 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 10,
   },
- 
+
   TextInput: {
     height: 50,
     flex: 1,
     padding: 10,
     marginLeft: 20,
   },
- 
+
   forgot_button: {
     height: 30,
     alignContent: 'flex-end',
-    
   },
- 
+
   registerBtn: {
     width: screen.width - 50,
     borderRadius: 25,
@@ -106,6 +116,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#121330",
   },
   registerText: {
-      color: 'white'
-  }
+    color: 'white'
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 15
+  },
 });

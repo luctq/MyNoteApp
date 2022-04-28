@@ -10,8 +10,11 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
+
+import BackButton from "../components/BackButton";
+
 var screen = Dimensions.get("window");
-export default function Login({login}) {
+export default function Login({ login, navigation}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -22,8 +25,16 @@ export default function Login({login}) {
     // navigation.navigate(....)
   }
 
+  const handleBackPress = () => {
+    navigation.goBack()
+  }
+  const handleRegisterPress = () => {
+    navigation.navigate('Register')
+  }
+
   return (
     <View style={styles.container}>
+      <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
       <Image style={styles.image} source={require("../../assets/logo.png")} />
 
       <StatusBar style="auto" />
@@ -62,10 +73,10 @@ export default function Login({login}) {
         <Text style={styles.loginText}>LOGIN</Text>
       </TouchableOpacity>
       <View style={{ flexDirection: 'row'}}>
-      <Text style={{ fontSize: 16}}>
-        Don't have an account?
-      </Text>
-      <TouchableOpacity>
+        <Text style={{ fontSize: 16}}>
+          Don't have an account?
+        </Text>
+        <TouchableOpacity onPress={handleRegisterPress}>
           <Text style={{ fontSize: 16, color: 'blue'}}>  Sign Up</Text>
         </TouchableOpacity>
       </View>
@@ -90,7 +101,6 @@ const styles = StyleSheet.create({
     height: 120,
     width: 120,
   },
-
   inputView: {
     backgroundColor: "#F0F0F0",
     borderRadius: 30,
@@ -98,19 +108,16 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 10,
   },
-
   TextInput: {
     height: 50,
     flex: 1,
     padding: 10,
     marginLeft: 20,
   },
-
   forgot_button: {
     height: 30,
     alignContent: "flex-end",
   },
-
   loginBtn: {
     width: screen.width - 50,
     borderRadius: 25,
@@ -123,5 +130,10 @@ const styles = StyleSheet.create({
   },
   loginText: {
     color: "white",
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 15
   },
 });

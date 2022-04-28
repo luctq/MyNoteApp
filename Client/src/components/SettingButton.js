@@ -1,18 +1,19 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 
-export default function SettingButton({style}) {
+export default function SettingButton({ style, onSettingPress}) {
   return (
       <View style={style}>
-        <Ionicons
-          name="settings-outline"
-          size={30}
-          color="black"
-          style={styles.icon}
-          onPress={() => alert('opening settings')}
-        />
+        <TouchableOpacity onPress={onSettingPress}>
+          <Ionicons
+            name="settings-outline"
+            size={30}
+            color="black"
+            style={styles.icon}
+          />
+        </TouchableOpacity>
       </View>
   );
 }

@@ -1,17 +1,22 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, {useState} from 'react';
 import DateTime from './DateTime';
 
-export default function NoteListItem({ style }) {
-    const [title, setTitle] = useState("Tiêu đề");
-    const [content, setContent] = useState("Nội dung ...")
+export default function NoteListItem({ style, onNoteListItemPress }) {
+
+  const [title, setTitle] = useState("Tiêu đề");
+  const [content, setContent] = useState("Nội dung ...")
+
   return (
     <View style={style}>
-      <View style={styles.container}>
+      <Pressable 
+        style={styles.container}
+        onPress={onNoteListItemPress}
+      >
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.content}>{content}</Text>
         <DateTime style={styles.time}/>
-      </View>
+      </Pressable>
     </View>
   )
 }

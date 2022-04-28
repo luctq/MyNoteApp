@@ -1,14 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import NoteListItem from './src/components/NoteListItem'
-import AddNewNoteButton from './src/components/AddNewNoteButton'
+
+import Router from './src/router/Router'
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
-      <NoteListItem />
-      <AddNewNoteButton />
+      <Router /> 
     </View>
   );
 }
@@ -17,7 +15,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

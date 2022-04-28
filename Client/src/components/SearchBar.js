@@ -4,7 +4,9 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 
 export default function SearchBar({style}) {
-    const [textSearch, setTextSearch] = useState("");
+
+  const [textSearch, setTextSearch] = useState("");
+  
   return (
     <View style={style}>
       <View style={styles.searchBar}>
