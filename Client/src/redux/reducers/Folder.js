@@ -11,20 +11,18 @@ const folder = createSlice({
     // các actions
     addFolder(state, action) {
       const newFolder = {
-        id: action.payload.id, // hoặc random ra id
+        id: state.folderList.length, // hoặc random ra id
         name: action.payload.name,
         noteCount: 0,
-        noteList: [],
       };
       state.folderList.push(newFolder);
     },
     deleteFolder(state, action) {},
     editFolderName(state, action) {},
-    addNoteToFolder(state, action) {},
   },
 });
 
-const { addFolder, deleteFolde, editFolderName, addNoteToFolder } =
+const { addFolder, deleteFolde, editFolderName } =
   folder.actions;
 
 export const createNewFolder = (info) => (dispatch) => {

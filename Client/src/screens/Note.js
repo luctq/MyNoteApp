@@ -13,6 +13,8 @@ import {
 } from 'react-native-pell-rich-editor'
 import * as ImagePicker from 'expo-image-picker'
 import Constants from 'expo-constants'
+import { connect } from "react-redux";
+
 
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
@@ -20,13 +22,21 @@ import ThreeDotButton from '../components/ThreeDotButton'
 import ShareFormModal from '../components/ShareFormModal'
 import DropDownOfThreeDot from '../components/DropDownOfThreeDot'
 import BackButton from '../components/BackButton'
+import { createNewNote } from "../redux/reducers/Note";
 
+const mapStateToProps = (state) => ({
+});
 
-function Note({ navigation }) {
+const mapActionToProps = {
+  createNewNote,
+};
 
+function Note({ navigation, route, createNewNote}) {
+  const note = route.params.item;
+  const isNew = route.params.isNew;
   const [isOpen, setIsOpen] = useState(false)
-  const [noteTitle, setNoteTitle] = useState('Ghi chu 1')
-  const [noteContent, setNoteContent] = useState('')
+  const [noteTitle, setNoteTitle] = useState(note.title)
+  const [noteContent, setNoteContent] = useState(note.content)
   const [heightEditor, setHeightEditor] = useState(520)
   const [isOpenDropDown, setIsOpenDropDown] = useState(false)
   const richText = useRef()
@@ -42,7 +52,12 @@ function Note({ navigation }) {
     setIsOpenDropDown(!isOpenDropDown)
   }
   const handleBackPress = () => {
-    navigation.goBack()
+    if (!isNew) {
+      // edit
+    } else if (noteTitle !== "" || noteContent !== "") {
+      createNewNote({...note, title: noteTitle, content: noteContent});
+    }
+    navigation.goBack();
   }
   const handlePressAddImage = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -163,4 +178,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Note
+export default connect(mapStateToProps, mapActionToProps)(Note);

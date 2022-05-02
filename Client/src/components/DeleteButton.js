@@ -1,20 +1,16 @@
 import { TouchableOpacity, StyleSheet, View, Text } from 'react-native'
 import AntIcons from 'react-native-vector-icons/AntDesign'
 
-function DeleteButton({ style }) {
+function DeleteButton({ style, onDeletePress }) {
 
   return (
-    <View style={style}>
+    <View style={style} onPress={onDeletePress}>
       <Text>Left</Text>
       <TouchableOpacity style={styles.container}>
-        <AntIcons 
-          name="delete"
-          size={25}
-          color="#fff"
-        />
+        <AntIcons name="delete" size={25} color="#fff" />
       </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({

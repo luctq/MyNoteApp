@@ -9,7 +9,7 @@ export default function AddNewNoteButton({ style, onAddNewNotePress }) {
         <AntDesign
           name="pluscircle"
           color="#FCC105"
-          size={80}
+          size={65}
           style={styles.icon}
         />
       </TouchableOpacity>

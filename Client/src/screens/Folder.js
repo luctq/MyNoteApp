@@ -2,6 +2,8 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
 import Constants from 'expo-constants'
+import { connect } from "react-redux";
+
 
 import SearchBar from '../components/SearchBar'
 import NoteListItem from '../components/NoteListItem'
@@ -9,8 +11,19 @@ import AddNewNoteButton from '../components/AddNewNoteButton'
 import DeleteButton from '../components/DeleteButton'
 import BackButton from '../components/BackButton'
 
-function Folder({ navigation }) {
 
+const mapStateToProps = (state) => ({
+  noteList: state.note.noteList,
+});
+
+const mapActionToProps = {
+};
+
+function Folder({ navigation, noteList, route }) {
+  const id = route.params.id;
+  const noteListInFolder = noteList.filter((note, index) => {
+    return note.folderId === id;
+  });
   const renderItem = (data, rowMap) => (
     <SwipeRow
       rightOpenValue={-80}
@@ -18,40 +31,52 @@ function Folder({ navigation }) {
       disableRightSwipe={true}
       style={styles.noteRow}
     >
-      <DeleteButton style={styles.deleteButton}/>
-      <NoteListItem 
-        style={styles.noteListItem} 
-        onNoteListItemPress={handleNoteListItemPress}
+      <DeleteButton style={styles.deleteButton} />
+      <NoteListItem
+        style={styles.noteListItem}
+        onNoteListItemPress={() => handleNoteListItemPress(data.item)}
+        info={data.item}
       />
     </SwipeRow>
-  )
-  const keyExtractor = (item) => item.id
+  );
+  const keyExtractor = (item) => item.id;
   const handleBackPress = () => {
-    navigation.goBack()
-  }
-  const handleNoteListItemPress = () => {
-    navigation.navigate('Note')
-  }
+    navigation.goBack();
+  };
+  const handleNoteListItemPress = (item) => {
+    navigation.navigate("Note", { item, isNew: false });
+  };
   const handleAddNewNotePress = () => {
-    navigation.navigate('Note')
-  }
+    navigation.navigate("Note", {
+      item: {
+        id: noteList.length,
+        folderId: id,
+        title: "",
+        content: "",
+        lastEdit: null,
+        isDeleted: false,
+        deleteTime: null,
+      },
+      isNew: true,
+    });
+  };
 
   return (
     <View style={styles.container}>
-      <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
+      <BackButton style={styles.backButton} onBackPress={handleBackPress} />
       <Text style={styles.header}>Thư mục</Text>
       <SearchBar style={styles.searchBar} />
-      <SwipeListView 
-        data={[{id: 0, noteTitle: 'Tiêu đề 1', noteContent: 'Nội dung...'}, {id: 1, noteTitle: 'Tiêu đề 2', noteContent: 'Nội dung...'}]}
+      <SwipeListView
+        data={noteListInFolder}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
       />
-      <AddNewNoteButton 
-        style={styles.addNewNoteButton} 
+      <AddNewNoteButton
+        style={styles.addNewNoteButton}
         onAddNewNotePress={handleAddNewNotePress}
       />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -103,4 +128,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Folder
+export default connect(mapStateToProps, mapActionToProps)(Folder);
