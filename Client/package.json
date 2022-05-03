@@ -12,12 +12,18 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-native-community/checkbox": "^0.5.12",
+    "@react-native-community/hooks": "^2.8.1",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.2",
     "@reduxjs/toolkit": "^1.8.1",
+    "@terrylinla/react-native-sketch-canvas": "^0.8.0",
     "axios": "^0.27.2",
     "expo": "~44.0.0",
+    "expo-av": "~10.2.0",
+    "expo-constants": "~13.0.1",
+    "expo-file-system": "~13.1.4",
     "expo-image-picker": "^12.0.2",
+    "expo-permissions": "^13.1.1",
     "expo-status-bar": "~1.2.0",
     "moment": "^2.29.3",
     "react": "17.0.1",
@@ -33,8 +39,7 @@
     "react-redux": "^8.0.1",
     "redux": "^4.2.0",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.4.1",
-    "expo-constants": "~13.0.1"
+    "redux-thunk": "^2.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

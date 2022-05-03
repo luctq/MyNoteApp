@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
+  Dimensions
 } from 'react-native'
 import {
   actions,
@@ -13,6 +14,11 @@ import {
 } from 'react-native-pell-rich-editor'
 import * as ImagePicker from 'expo-image-picker'
 import Constants from 'expo-constants'
+import { Audio } from 'expo-av'
+import * as FileSystem from 'expo-file-system'
+import FontAwesomeIcons from 'react-native-vector-icons/FontAwesome'
+import FoundationIcons from 'react-native-vector-icons/Foundation'
+import * as Permissions from 'expo-permissions'
 
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
@@ -21,14 +27,21 @@ import ShareFormModal from '../components/ShareFormModal'
 import DropDownOfThreeDot from '../components/DropDownOfThreeDot'
 import BackButton from '../components/BackButton'
 
+const screen = Dimensions.get('window')
+
 
 function Note({ navigation }) {
 
   const [isOpen, setIsOpen] = useState(false)
   const [noteTitle, setNoteTitle] = useState('Ghi chu 1')
   const [noteContent, setNoteContent] = useState('')
-  const [heightEditor, setHeightEditor] = useState(520)
+  const [proFocus, setProFocus] = useState({
+    height: screen.height - Constants.statusBarHeight - 80,
+    bottom: -40
+  })
   const [isOpenDropDown, setIsOpenDropDown] = useState(false)
+  const [isDisableButton, setIsDisableButton] = useState(false)
+  const [recording, setRecording] = useState()
   const richText = useRef()
   const editorView = useRef()
 
@@ -54,8 +67,59 @@ function Note({ navigation }) {
       base64: true,
     })
     if (!result.cancelled) {
-      richText.current.insertImage('data:image/pngbase64, ' + result.base64)
+      richText.current.insertImage('data:image/png;base64,' + result.base64)
     }
+  })
+  const handleLaunchCamera = useCallback(async () => {
+    const { status } = await  ImagePicker.requestCameraPermissionsAsync()
+    if (status === 'granted') {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes:ImagePicker.MediaTypeOptions.Images,
+        allowsEditing:true,
+        aspect: [1,1],
+        quality: 0.5,
+        presentationStyle: 0,
+        base64: true
+      })
+      if (!result.cancelled) {
+        richText.current.insertImage('data:image/png;base64,' + result.base64)
+      }
+    }else {
+      throw new Error('Location permission not granted');
+    }
+  })
+  const handleInsertVoice = useCallback(async () => {
+    try {
+      console.log('Requesting permissions..');
+      await Audio.requestPermissionsAsync();
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      }); 
+      console.log('Starting recording..');
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+      setRecording(recording);
+      console.log('Recording started');
+    } catch (err) {
+      console.error('Failed to start recording', err);
+    }
+  })
+  const handleStopRecording = useCallback(async () => {
+    console.log('Stopping recording..');
+    setRecording(undefined);
+    await recording.stopAndUnloadAsync();
+    const uri = recording.getURI(); 
+    const base64 = await FileSystem.readAsStringAsync(uri, {encoding: 'base64'})
+    richText.current.insertHTML(
+    `
+      <div>
+        <audio controls>
+          <source src='data:audio/mp4;base64,${base64}' type='audio/mp4'/>
+        </audio>
+      </div>
+    `)
   })
 
   return (
@@ -70,9 +134,16 @@ function Note({ navigation }) {
         <ShareButton
           style={styles.shareButton}
           handlePress={() => setIsOpen(!isOpen)}
+          isDisable={isDisableButton}
         />
-        <ChangeBackgroundButton style={styles.changeBackgroundButton} />
-        <ThreeDotButton onButtonPress={handlePressFolderIcon} />
+        <ChangeBackgroundButton 
+          style={styles.changeBackgroundButton}
+          isDisable={isDisableButton}
+        />
+        <ThreeDotButton 
+          onButtonPress={handlePressFolderIcon}
+          isDisable={isDisableButton}
+        />
       </View>
       <TextInput
         placeholder='Write title...'
@@ -80,11 +151,13 @@ function Note({ navigation }) {
         onChangeText={handleNoteTitleChange}
         style={styles.titleNote}
       />
-      <View>
+      <View style={{  }}>
         <RichToolbar
           editor={richText}
           actions={[
             actions.insertImage,
+            'insertVoice',
+            'launchCamera',
             actions.keyboard,
             actions.setBold,
             actions.setItalic,
@@ -97,12 +170,35 @@ function Note({ navigation }) {
             [actions.heading1]: ({ tintColor }) => (
               <Text style={[{ color: tintColor }]}>H1</Text>
             ),
+            insertVoice: ({ tintColor }) => (
+              recording ? 
+                (<FontAwesomeIcons 
+                  name='stop-circle'
+                  size={25}
+                  color={tintColor}
+                />) : (
+                  <FoundationIcons 
+                    name='record'
+                    size={25}
+                    color={tintColor}
+                  />
+                )
+            ),
+            launchCamera: ({ tintColor }) => (
+              <FontAwesomeIcons 
+                name='camera'
+                size={20}
+                color={tintColor}
+              />
+            )
           }}
-          style={{ backgroundColor: '#f7f7f7' }}
+          style={[styles.richToolBar, { bottom: proFocus.bottom }]}
           onPressAddImage={handlePressAddImage}
+          insertVoice={recording ? handleStopRecording : handleInsertVoice}
+          launchCamera={handleLaunchCamera}
         />
         <ScrollView
-          style={[styles.editorView, { height: heightEditor }]}
+          style={[styles.editorView, { height: proFocus.height }]}
           ref={editorView}
           onContentSizeChange={() =>
             editorView.current.scrollToEnd({ animated: true })
@@ -116,9 +212,21 @@ function Note({ navigation }) {
             }}
             editorStyle={{ backgroundColor: '#f7f7f7' }}
             placeholder='Type something here...'
-            // style={{ borderColor: 'red', borderWidth: 1 }}
-            onFocus={() => setHeightEditor(320)}
-            onBlur={() => setHeightEditor(520)}
+            style={styles.richEditor}
+            onFocus={() => {
+              setProFocus({
+                height: screen.height - Constants.statusBarHeight - 80 - 248,
+                bottom: -36
+              })
+              setIsDisableButton(true)
+            }}
+            onBlur={() => {
+              setProFocus({
+                height: screen.height - Constants.statusBarHeight - 80,
+                bottom: -40
+              })
+              setIsDisableButton(false)
+            }}
           />
         </ScrollView>
       </View>
@@ -131,7 +239,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f7f7',
     flex: 1,
     paddingHorizontal: 25,
-    // marginTop: 10,
   },
   headerIcon: {
     flexDirection: 'row',
@@ -153,14 +260,27 @@ const styles = StyleSheet.create({
   },
   noteContent: {},
   editorView: {
-    // borderColor: 'green',
-    // borderWidth: 2,
+    // borderColor: 'red',
+    // borderWidth: 1
   },
   backButton: {
     position: 'absolute',
     top: Constants.statusBarHeight + 5,
     left: 15
   },
+  richToolBar: {
+    backgroundColor: '#f7f7f7', 
+    position: 'absolute',
+    zIndex: 1,
+    // borderColor: 'pink',
+    // borderWidth: 1
+  },
+  richEditor: {
+    // borderColor: 'green',
+    // borderWidth: 1
+  },
 })
 
 export default Note
+
+

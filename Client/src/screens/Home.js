@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
 import Constants from 'expo-constants'
+import { connect } from 'react-redux'
 
 import SettingButton from '../components/SettingButton'
 import SearchBar from '../components/SearchBar'
@@ -14,7 +15,7 @@ import AntIcons from 'react-native-vector-icons/AntDesign'
 const folderCount = 1
 
 
-function Home({ navigation }) {
+function Home({ navigation, folderList }) {
 
   const [isOpenDropDown, setIsOpenDropDown] = useState(false)
 
@@ -141,4 +142,9 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Home
+const mapStateToProps = (state) => ({
+  folderList: state.folder.folderList
+})
+const mapActionToProps = {}
+
+export default connect(mapStateToProps, mapActionToProps)(Home)
