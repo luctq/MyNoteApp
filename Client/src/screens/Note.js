@@ -18,7 +18,6 @@ import { Audio } from 'expo-av'
 import * as FileSystem from 'expo-file-system'
 import FontAwesomeIcons from 'react-native-vector-icons/FontAwesome'
 import FoundationIcons from 'react-native-vector-icons/Foundation'
-import * as Permissions from 'expo-permissions'
 
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
@@ -26,19 +25,27 @@ import ThreeDotButton from '../components/ThreeDotButton'
 import ShareFormModal from '../components/ShareFormModal'
 import DropDownOfThreeDot from '../components/DropDownOfThreeDot'
 import BackButton from '../components/BackButton'
+import { createNewNote } from "../redux/reducers/Note";
 
 const screen = Dimensions.get('window')
 
+const mapStateToProps = (state) => ({
+});
 
-function Note({ navigation }) {
+const mapActionToProps = {
+  createNewNote,
+};
 
+function Note({ navigation, route, createNewNote}) {
+  const note = route.params.item;
+  const isNew = route.params.isNew;
   const [isOpen, setIsOpen] = useState(false)
-  const [noteTitle, setNoteTitle] = useState('Ghi chu 1')
-  const [noteContent, setNoteContent] = useState('')
   const [proFocus, setProFocus] = useState({
     height: screen.height - Constants.statusBarHeight - 80,
     bottom: -40
   })
+  const [noteTitle, setNoteTitle] = useState(note.title)
+  const [noteContent, setNoteContent] = useState(note.content)
   const [isOpenDropDown, setIsOpenDropDown] = useState(false)
   const [isDisableButton, setIsDisableButton] = useState(false)
   const [recording, setRecording] = useState()
@@ -55,7 +62,12 @@ function Note({ navigation }) {
     setIsOpenDropDown(!isOpenDropDown)
   }
   const handleBackPress = () => {
-    navigation.goBack()
+    if (!isNew) {
+      // edit
+    } else if (noteTitle !== "" || noteContent !== "") {
+      createNewNote({...note, title: noteTitle, content: noteContent});
+    }
+    navigation.goBack();
   }
   const handlePressAddImage = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -281,6 +293,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Note
-
-
+export default connect(mapStateToProps, mapActionToProps)(Note);

@@ -1,24 +1,32 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native'
-import React, {useState} from 'react';
-import DateTime from './DateTime';
+import { StyleSheet, Text, View, Pressable } from "react-native";
+import React, { useState } from "react";
+import DateTime from "./DateTime";
 
-export default function NoteListItem({ style, onNoteListItemPress }) {
-
-  const [title, setTitle] = useState("Tiêu đề");
-  const [content, setContent] = useState("Nội dung ...")
+export default function NoteListItem({ style, onNoteListItemPress, info }) {
+  const getNoteTitle = (noteContent) => {
+    if (!noteContent || noteContent.length <= 30) {
+      return noteContent;
+    }
+    return noteContent.slice(0, 30) + "...";
+  };
 
   return (
     <View style={style}>
-      <Pressable 
-        style={styles.container}
-        onPress={onNoteListItemPress}
-      >
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.content}>{content}</Text>
-        <DateTime style={styles.time}/>
+      <Pressable style={styles.container} onPress={onNoteListItemPress}>
+        {info.title ? (
+          <Text style={styles.title}>{getNoteTitle(info.title)}</Text>
+        ) : (
+          <></>
+        )}
+        {info.content ? (
+          <Text style={styles.content}>{getNoteTitle(info.content)}</Text>
+        ) : (
+          <></>
+        )}
+        <DateTime style={styles.time} />
       </Pressable>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -40,6 +48,7 @@ const styles = StyleSheet.create({
   content: {
     fontSize: 18,
     marginBottom: 5,
+    opacity: 0.7,
   },
   time: {
     color: "#B9B9B9",

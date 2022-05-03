@@ -1,7 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  noteList: [],
+  noteList: [
+    {
+      id: 0,
+      folderId: 0,
+      title: "Test",
+      content: "Nội dung skgdbá kdg ksdfk sdkf sbkdjhvvhvh...",
+      lastEdit: "",
+      isDeleted: false,
+      deleteTime: "",
+    },
+  ],
 };
 
 const note = createSlice({
@@ -11,13 +21,13 @@ const note = createSlice({
     // các actions
     addNote(state, action) {
       const newNote = {
-        id: action.payload.id,
+        id: state.noteList.length,
         folderId: action.payload.folderId,
         title: action.payload.title,
-        noteContent: action.payload.noteContent,
-        lastEdit: action.payload.lastEdit,
-        isDeleted: action.payload.isDeleted, // hoặc để mặc định là false
-        deleteTime: action.payload.deleteTime, // hoặc để mặc định là null
+        content: action.payload.content,
+        lastEdit: null,
+        isDeleted: false, 
+        deleteTime: null, 
       };
       state.noteList.push(newNote);
     },

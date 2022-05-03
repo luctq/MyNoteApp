@@ -1,12 +1,8 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
-import { useState } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function FolderListItem({ style, onFolderListItemPress }) {
+export default function FolderListItem({ style, onFolderListItemPress, info }) {
 
-  const [title, setTitle] = useState("Tiêu đề");
-  const [count, setCount] = useState(0);
-  
   return (
     <View style={style}>
       <Pressable style={styles.container} onPress={onFolderListItemPress}>
@@ -16,8 +12,8 @@ export default function FolderListItem({ style, onFolderListItemPress }) {
           color="orange"
           style={styles.icon}
         />
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.count}>{count}</Text>
+        <Text style={styles.title}>{info.name}</Text>
+        <Text style={styles.count}>{info.noteCount}</Text>
       </Pressable>
     </View>
   );

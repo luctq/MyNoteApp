@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,13 +8,32 @@ import {
   Pressable,
 } from "react-native";
 import Modal from "react-native-modalbox";
+import { connect } from "react-redux";
+import { createNewFolder } from "../redux/reducers/Folder";
+
 var screen = Dimensions.get("window");
-export default function NewFolderModal(props) {
+
+const mapStateToProps = (state) => ({
+  folderList: state.folder.folderList,
+});
+
+const mapActionToProps = {
+  createNewFolder,
+};
+
+function NewFolderModal(props) {
+  const [folderName, setFolderName] = useState("");
   const ref = useRef();
   const openModal = () => {
     ref.current.open();
   };
-  const inputRef = useRef()
+  const inputRef = useRef();
+
+  function handleCreateFolder() {
+    props.createNewFolder({ id: props.folderList.length, name: folderName });
+    ref.current.close();
+  }
+
   return (
     <Modal
       ref={ref}
@@ -24,10 +43,12 @@ export default function NewFolderModal(props) {
       isOpen={props.isOpen}
       onClosed={props.onClosed}
     >
-      <Text style={{ fontSize: 20, fontWeight: 'bold'}}>Thư mục mới</Text>
+      <Text style={{ fontSize: 20, fontWeight: "bold" }}>Thư mục mới</Text>
       <TextInput
         ref={inputRef}
         onLayout={() => inputRef.current.focus()}
+        value={folderName}
+        onChangeText={(text) => setFolderName(text)}
         autoFocus={true}
         style={styles.input}
         placeholder="Thư mục ghi chú"
@@ -39,7 +60,10 @@ export default function NewFolderModal(props) {
         >
           <Text style={{ color: "black" }}>Hủy</Text>
         </Pressable>
-        <Pressable style={styles.button_ok} onPress={() => console.log("OK")}>
+        <Pressable
+          style={styles.button_ok}
+          onPress={() => handleCreateFolder()}
+        >
           <Text style={{ color: "white" }}>OK</Text>
         </Pressable>
       </View>
@@ -60,7 +84,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     width: screen.width,
     height: 200,
-    alignItems: 'center'
+    alignItems: "center",
   },
   input_container: {
     flexDirection: "row",
@@ -80,7 +104,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: screen.width - 50,
     marginTop: 20,
-    padding: 10
+    padding: 10,
   },
   button_container: {
     width: screen.width,
@@ -105,3 +129,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default connect(mapStateToProps, mapActionToProps)(NewFolderModal);
