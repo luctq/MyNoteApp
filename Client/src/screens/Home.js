@@ -1,9 +1,8 @@
-import { useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
-import { connect } from "react-redux";
-
-import Constants from "expo-constants";
+import { useState } from 'react'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
+import Constants from 'expo-constants'
+import { connect } from 'react-redux'
 
 import SettingButton from "../components/SettingButton";
 import SearchBar from "../components/SearchBar";

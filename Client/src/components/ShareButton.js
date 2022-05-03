@@ -1,15 +1,19 @@
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import AntIcons from 'react-native-vector-icons/AntDesign'
 
-function ShareButton({ style, handlePress }) {
+function ShareButton({ style, handlePress, isDisable }) {
 
   return (
     <View style={style}>
-      <TouchableOpacity style={styles.container} onPress={handlePress}>
+      <TouchableOpacity 
+        style={styles.container} 
+        onPress={handlePress}
+        disabled={isDisable}
+      >
         <AntIcons 
           name="sharealt"
           size={25}
-          color="#000"
+          color={isDisable ? '#ddd' : '#000'}
         />
       </TouchableOpacity>
     </View>
