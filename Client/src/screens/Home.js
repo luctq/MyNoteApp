@@ -13,10 +13,11 @@ import DropDownOfFolder from "../components/DropDownOfFolder";
 import AntIcons from "react-native-vector-icons/AntDesign";
 
 import { deleteFolder } from "../redux/reducers/Folder";
-import { deleteNote, deleteNoteInFolder } from "../redux/reducers/Note";
+import { deleteNoteInFolder } from "../redux/reducers/Note";
 
 const mapStateToProps = (state) => ({
   folderList: state.folder.folderList,
+  folderCount: state.folder.folderCount,
 });
 
 const mapActionToProps = {
@@ -24,7 +25,7 @@ const mapActionToProps = {
   deleteNoteInFolder,
 };
 
-function Home({ navigation, folderList, deleteFolder, deleteNoteInFolder }) {
+function Home({ navigation, folderList, folderCount, deleteFolder, deleteNoteInFolder }) {
   const [isOpenDropDown, setIsOpenDropDown] = useState(false);
 
   const handlePressFolderIcon = () => {
@@ -36,8 +37,8 @@ function Home({ navigation, folderList, deleteFolder, deleteNoteInFolder }) {
   const handleRecycleBinPress = () => {
     navigation.navigate("RecycleBin");
   };
-  const handleFolderListItemPress = (id) => {
-    navigation.navigate("Folder", { id });
+  const handleFolderListItemPress = (id, name) => {
+    navigation.navigate("Folder", { name, id });
   };
   const handleDeleteFolder = (id) => {
     deleteNoteInFolder(id);
@@ -59,7 +60,7 @@ function Home({ navigation, folderList, deleteFolder, deleteNoteInFolder }) {
           <FolderListItem
             style={styles.folderListItem}
             onFolderListItemPress={() =>
-              handleFolderListItemPress(data.item.id)
+              handleFolderListItemPress(data.item.id, data.item.name)
             }
             info={data.item}
           />
@@ -91,7 +92,7 @@ function Home({ navigation, folderList, deleteFolder, deleteNoteInFolder }) {
         <CheckButton style={styles.checkButton} />
       </View>
       <SearchBar style={styles.searchBar} />
-      {folderList.length === 0 ? (
+      {folderCount === 0 ? (
         <View>
           <Image
             source={require("../public/emptyNote.png")}

@@ -36,14 +36,20 @@ const note = createSlice({
       state.noteList.push(newNote);
     },
     deleteNoteById(state, action) {
-      state.noteList = state.noteList.filter(
-        (note, index) => {
-          if (note.id === action.payload) {
-            note.isDeleted = true;
-          }
-          return note;
+      state.noteList = state.noteList.filter((note, index) => {
+        if (note.id === action.payload) {
+          note.isDeleted = true;
         }
-      );
+        return note;
+      });
+    },
+    restoreNoteById(state, action) {
+      state.noteList = state.noteList.filter((note, index) => {
+        if (note.id === action.payload) {
+          note.isDeleted = false;
+        }
+        return note;
+      });
     },
     deleteNoteInFolderById(state, action) {
       state.noteList = state.noteList.filter((note, index) => {
@@ -53,12 +59,33 @@ const note = createSlice({
         return note;
       });
     },
-    editNote(state, action) {},
+    editNote(state, action) {
+      state.noteList = state.noteList.filter((note, index) => {
+        if (note.id === action.payload.id) {
+          note.title = action.payload.title;
+          note.content = action.payload.content;
+          // cập nhật lastEdit
+          // note.lastEdit = Date.now();
+        }
+        return note;
+      });
+    },
+    expulsionNoteById(state, action) {
+      state.noteList = state.noteList.filter(
+        (note, index) => note.id !== action.payload
+      );
+    },
   },
 });
 
-export const { addNote, deleteNoteById, editNote, deleteNoteInFolderById } =
-  note.actions;
+export const {
+  addNote,
+  deleteNoteById,
+  restoreNoteById,
+  editNote,
+  deleteNoteInFolderById,
+  expulsionNoteById,
+} = note.actions;
 
 export const createNewNote = (info) => (dispatch) => {
   dispatch(addNote(info));
@@ -70,8 +97,21 @@ export const deleteNote = (id) => (dispatch) => {
   dispatch(decNoteCountById(id));
 };
 
+export const restoreNote = (note) => (dispatch) => {
+  dispatch(restoreNoteById(note.id));
+  dispatch(incNoteCountById(note.folderId));
+};
+
 export const deleteNoteInFolder = (folderId) => (dispatch) => {
   dispatch(deleteNoteInFolderById(folderId));
 };
+
+export const updateNote = (note) => (dispatch) => {
+  dispatch(editNote(note));
+};
+
+export const expulsionNote = (id) => (dispatch) => {
+  dispatch(expulsionNoteById(id));
+}
 
 export default note.reducer;

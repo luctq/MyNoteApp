@@ -23,6 +23,7 @@ const mapActionToProps = {
 
 function Folder({ navigation, noteList, route, deleteNote }) {
   const id = route.params.id;
+  const name = route.params.name;
   const noteListInFolder = noteList.filter((note, index) => {
     return note.folderId === id;
   });
@@ -73,7 +74,7 @@ function Folder({ navigation, noteList, route, deleteNote }) {
   return (
     <View style={styles.container}>
       <BackButton style={styles.backButton} onBackPress={handleBackPress} />
-      <Text style={styles.header}>Thư mục</Text>
+      <Text style={styles.header}>{name}</Text>
       <SearchBar style={styles.searchBar} />
       <SwipeListView
         data={noteListInFolder}

@@ -27,7 +27,11 @@ import ThreeDotButton from '../components/ThreeDotButton'
 import ShareFormModal from '../components/ShareFormModal'
 import DropDownOfThreeDot from '../components/DropDownOfThreeDot'
 import BackButton from '../components/BackButton'
-import { createNewNote } from "../redux/reducers/Note";
+import {
+  createNewNote,
+  updateNote,
+  expulsionNote,
+} from "../redux/reducers/Note";
 
 const screen = Dimensions.get('window')
 
@@ -36,41 +40,44 @@ const mapStateToProps = (state) => ({
 
 const mapActionToProps = {
   createNewNote,
+  updateNote,
+  expulsionNote,
 };
 
-function Note({ navigation, route, createNewNote}) {
+function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   const note = route.params.item;
   const isNew = route.params.isNew;
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
   const [proFocus, setProFocus] = useState({
     height: screen.height - Constants.statusBarHeight - 80,
-    bottom: -40
-  })
-  const [noteTitle, setNoteTitle] = useState(note.title)
-  const [noteContent, setNoteContent] = useState(note.content)
-  const [isOpenDropDown, setIsOpenDropDown] = useState(false)
-  const [isDisableButton, setIsDisableButton] = useState(false)
-  const [recording, setRecording] = useState()
-  const richText = useRef()
-  const editorView = useRef()
+    bottom: -40,
+  });
+  const [noteTitle, setNoteTitle] = useState(note.title);
+  const [noteContent, setNoteContent] = useState(note.content);
+  const [isOpenDropDown, setIsOpenDropDown] = useState(false);
+  const [isDisableButton, setIsDisableButton] = useState(false);
+  const [recording, setRecording] = useState();
+  const richText = useRef();
+  const editorView = useRef();
 
   const handleNoteTitleChange = (noteTitle) => {
-    setNoteTitle(noteTitle)
-  }
+    setNoteTitle(noteTitle);
+  };
   const handleNoteContentChange = (noteContent) => {
-    setNoteContent(noteContent)
-  }
+    setNoteContent(noteContent);
+  };
   const handlePressFolderIcon = () => {
-    setIsOpenDropDown(!isOpenDropDown)
-  }
+    setIsOpenDropDown(!isOpenDropDown);
+  };
   const handleBackPress = () => {
     if (!isNew) {
-      // edit
+      if (noteContent === "" && noteTitle === "") expulsionNote(note.id);
+      else updateNote({ ...note, title: noteTitle, content: noteContent });
     } else if (noteTitle !== "" || noteContent !== "") {
-      createNewNote({...note, title: noteTitle, content: noteContent});
+      createNewNote({ ...note, title: noteTitle, content: noteContent });
     }
     navigation.goBack();
-  }
+  };
   const handlePressAddImage = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -79,66 +86,69 @@ function Note({ navigation, route, createNewNote}) {
       quality: 1,
       presentationStyle: 0, //tránh bị out
       base64: true,
-    })
+    });
     if (!result.cancelled) {
-      richText.current.insertImage('data:image/png;base64,' + result.base64)
+      richText.current.insertImage("data:image/png;base64," + result.base64);
     }
-  })
+  });
   const handleLaunchCamera = useCallback(async () => {
-    const { status } = await  ImagePicker.requestCameraPermissionsAsync()
-    if (status === 'granted') {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status === "granted") {
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes:ImagePicker.MediaTypeOptions.Images,
-        allowsEditing:true,
-        aspect: [1,1],
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
         quality: 0.5,
         presentationStyle: 0,
-        base64: true
-      })
+        base64: true,
+      });
       if (!result.cancelled) {
-        richText.current.insertImage('data:image/png;base64,' + result.base64)
+        richText.current.insertImage("data:image/png;base64," + result.base64);
       }
-    }else {
-      throw new Error('Location permission not granted');
+    } else {
+      throw new Error("Location permission not granted");
     }
-  })
+  });
   const handleInsertVoice = useCallback(async () => {
     try {
-      console.log('Requesting permissions..');
+      console.log("Requesting permissions..");
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
-      }); 
-      console.log('Starting recording..');
+      });
+      console.log("Starting recording..");
       const { recording } = await Audio.Recording.createAsync(
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
       );
       setRecording(recording);
-      console.log('Recording started');
+      console.log("Recording started");
     } catch (err) {
-      console.error('Failed to start recording', err);
+      console.error("Failed to start recording", err);
     }
-  })
+  });
   const handleStopRecording = useCallback(async () => {
-    console.log('Stopping recording..');
+    console.log("Stopping recording..");
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
-    const uri = recording.getURI(); 
-    const base64 = await FileSystem.readAsStringAsync(uri, {encoding: 'base64'})
+    const uri = recording.getURI();
+    const base64 = await FileSystem.readAsStringAsync(uri, {
+      encoding: "base64",
+    });
     richText.current.insertHTML(
-    `
+      `
       <div>
         <audio controls>
           <source src='data:audio/mp4;base64,${base64}' type='audio/mp4'/>
         </audio>
       </div>
-    `)
-  })
+    `
+    );
+  });
 
   return (
     <View style={styles.container}>
-      <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
+      <BackButton style={styles.backButton} onBackPress={handleBackPress} />
       <DropDownOfThreeDot
         isOpen={isOpenDropDown}
         setIsOpen={() => handlePressFolderIcon()}
@@ -150,28 +160,28 @@ function Note({ navigation, route, createNewNote}) {
           handlePress={() => setIsOpen(!isOpen)}
           isDisable={isDisableButton}
         />
-        <ChangeBackgroundButton 
+        <ChangeBackgroundButton
           style={styles.changeBackgroundButton}
           isDisable={isDisableButton}
         />
-        <ThreeDotButton 
+        <ThreeDotButton
           onButtonPress={handlePressFolderIcon}
           isDisable={isDisableButton}
         />
       </View>
       <TextInput
-        placeholder='Write title...'
+        placeholder="Write title..."
         value={noteTitle}
         onChangeText={handleNoteTitleChange}
         style={styles.titleNote}
       />
-      <View style={{  }}>
+      <View style={{}}>
         <RichToolbar
           editor={richText}
           actions={[
             actions.insertImage,
-            'insertVoice',
-            'launchCamera',
+            "insertVoice",
+            "launchCamera",
             actions.keyboard,
             actions.setBold,
             actions.setItalic,
@@ -184,27 +194,19 @@ function Note({ navigation, route, createNewNote}) {
             [actions.heading1]: ({ tintColor }) => (
               <Text style={[{ color: tintColor }]}>H1</Text>
             ),
-            insertVoice: ({ tintColor }) => (
-              recording ? 
-                (<FontAwesomeIcons 
-                  name='stop-circle'
+            insertVoice: ({ tintColor }) =>
+              recording ? (
+                <FontAwesomeIcons
+                  name="stop-circle"
                   size={25}
                   color={tintColor}
-                />) : (
-                  <FoundationIcons 
-                    name='record'
-                    size={25}
-                    color={tintColor}
-                  />
-                )
-            ),
+                />
+              ) : (
+                <FoundationIcons name="record" size={25} color={tintColor} />
+              ),
             launchCamera: ({ tintColor }) => (
-              <FontAwesomeIcons 
-                name='camera'
-                size={20}
-                color={tintColor}
-              />
-            )
+              <FontAwesomeIcons name="camera" size={20} color={tintColor} />
+            ),
           }}
           style={[styles.richToolBar, { bottom: proFocus.bottom }]}
           onPressAddImage={handlePressAddImage}
@@ -222,30 +224,30 @@ function Note({ navigation, route, createNewNote}) {
             ref={richText}
             initialContentHTML={noteContent}
             onChange={(text) => {
-              handleNoteContentChange(text)
+              handleNoteContentChange(text);
             }}
-            editorStyle={{ backgroundColor: '#f7f7f7' }}
-            placeholder='Type something here...'
+            editorStyle={{ backgroundColor: "#f7f7f7" }}
+            placeholder="Type something here..."
             style={styles.richEditor}
             onFocus={() => {
               setProFocus({
                 height: screen.height - Constants.statusBarHeight - 80 - 248,
-                bottom: -36
-              })
-              setIsDisableButton(true)
+                bottom: -36,
+              });
+              setIsDisableButton(true);
             }}
             onBlur={() => {
               setProFocus({
                 height: screen.height - Constants.statusBarHeight - 80,
-                bottom: -40
-              })
-              setIsDisableButton(false)
+                bottom: -40,
+              });
+              setIsDisableButton(false);
             }}
           />
         </ScrollView>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
