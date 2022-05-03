@@ -51,7 +51,6 @@ const folder = createSlice({
       });
       state.folderCount++;
     },
-    editFolderNameById(state, action) {},
     incNoteCountById(state, action) {
       state.folderList = state.folderList.filter((folder, index) => {
         if (folder.id === action.payload) {
@@ -75,7 +74,6 @@ export const {
   addFolder,
   deleteFolderById,
   restoreFolderById,
-  editFolderNameById,
   incNoteCountById,
   decNoteCountById,
 } = folder.actions;
