@@ -38,6 +38,7 @@ export default function DropDownOfFolder(props) {
       props.setIsOpen(false);
       setIsOpenModal(true);
     } else if (option == "Thùng rác") {
+      props.setIsOpen(false);
       props.onRecycleBinPress()
     } 
   };

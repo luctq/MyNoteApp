@@ -36,14 +36,20 @@ const note = createSlice({
       state.noteList.push(newNote);
     },
     deleteNoteById(state, action) {
-      state.noteList = state.noteList.filter(
-        (note, index) => {
-          if (note.id === action.payload) {
-            note.isDeleted = true;
-          }
-          return note;
+      state.noteList = state.noteList.filter((note, index) => {
+        if (note.id === action.payload) {
+          note.isDeleted = true;
         }
-      );
+        return note;
+      });
+    },
+    restoreNoteById(state, action) {
+      state.noteList = state.noteList.filter((note, index) => {
+        if (note.id === action.payload) {
+          note.isDeleted = false;
+        }
+        return note;
+      });
     },
     deleteNoteInFolderById(state, action) {
       state.noteList = state.noteList.filter((note, index) => {
@@ -57,8 +63,13 @@ const note = createSlice({
   },
 });
 
-export const { addNote, deleteNoteById, editNote, deleteNoteInFolderById } =
-  note.actions;
+export const {
+  addNote,
+  deleteNoteById,
+  restoreNoteById,
+  editNote,
+  deleteNoteInFolderById,
+} = note.actions;
 
 export const createNewNote = (info) => (dispatch) => {
   dispatch(addNote(info));
@@ -68,6 +79,11 @@ export const createNewNote = (info) => (dispatch) => {
 export const deleteNote = (id) => (dispatch) => {
   dispatch(deleteNoteById(id));
   dispatch(decNoteCountById(id));
+};
+
+export const restoreNote = (note) => (dispatch) => {
+  dispatch(restoreNoteById(note.id));
+  dispatch(incNoteCountById(note.folderId));
 };
 
 export const deleteNoteInFolder = (folderId) => (dispatch) => {
