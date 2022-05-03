@@ -19,8 +19,6 @@ import * as FileSystem from 'expo-file-system'
 import FontAwesomeIcons from 'react-native-vector-icons/FontAwesome'
 import FoundationIcons from 'react-native-vector-icons/Foundation'
 import { connect } from "react-redux";
-
-
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
 import ThreeDotButton from '../components/ThreeDotButton'
@@ -32,7 +30,7 @@ import {
   updateNote,
   expulsionNote,
 } from "../redux/reducers/Note";
-
+import ChangeBackgroundModal from '../components/ChangeBackgroundModal'
 const screen = Dimensions.get('window')
 
 const mapStateToProps = (state) => ({
@@ -59,7 +57,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   const [recording, setRecording] = useState();
   const richText = useRef();
   const editorView = useRef();
-
+  const [isOpenModalChangeBackground, setIsOpenModalChangeBackground] = useState(false)
   const handleNoteTitleChange = (noteTitle) => {
     setNoteTitle(noteTitle);
   };
@@ -68,6 +66,9 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   };
   const handlePressFolderIcon = () => {
     setIsOpenDropDown(!isOpenDropDown);
+  };
+  const handlePressChangeBackgroundIcon = () => {
+    setIsOpenModalChangeBackground(!isOpenModalChangeBackground)
   };
   const handleBackPress = () => {
     if (!isNew) {
@@ -145,10 +146,10 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
     `
     );
   });
-
   return (
     <View style={styles.container}>
       <BackButton style={styles.backButton} onBackPress={handleBackPress} />
+      <ChangeBackgroundModal isOpen={isOpenModalChangeBackground} onClosed={() => setIsOpenModalChangeBackground(false)}/>
       <DropDownOfThreeDot
         isOpen={isOpenDropDown}
         setIsOpen={() => handlePressFolderIcon()}
@@ -162,6 +163,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
         />
         <ChangeBackgroundButton
           style={styles.changeBackgroundButton}
+          onButtonChangeBackground={handlePressChangeBackgroundIcon}
           isDisable={isDisableButton}
         />
         <ThreeDotButton

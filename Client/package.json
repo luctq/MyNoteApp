@@ -29,6 +29,7 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
+    "react-native-common-date-picker": "^2.3.7",
     "react-native-datepicker": "^1.7.2",
     "react-native-modal-dropdown": "^1.0.2",
     "react-native-modalbox": "^2.0.2",

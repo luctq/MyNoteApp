@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import AntIcons from 'react-native-vector-icons/AntDesign'
-
-function ChangeBackgroundButton({ style, isDisable }) {
-
+import ChangeBackgroundModal from "./ChangeBackgroundModal";
+function ChangeBackgroundButton({ style, onButtonChangeBackground,  isDisable }) {
+  const [isOpen, setIsOpen] = useState(false)
   return (
     <View style={style}>
+      <ChangeBackgroundModal isOpen={isOpen} onClosed={() => setIsOpen(false)}/>
       <TouchableOpacity 
-        onPress={() => alert('Change background press!')}
+        onPress={onButtonChangeBackground}
         disabled={isDisable}
       >
         <AntIcons 
