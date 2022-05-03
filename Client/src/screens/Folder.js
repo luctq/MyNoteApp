@@ -26,24 +26,28 @@ function Folder({ navigation, noteList, route, deleteNote }) {
   const noteListInFolder = noteList.filter((note, index) => {
     return note.folderId === id;
   });
-  const renderItem = (data, rowMap) => (
-    <SwipeRow
-      rightOpenValue={-80}
-      leftOpenValue={0}
-      disableRightSwipe={true}
-      style={styles.noteRow}
-    >
-      <DeleteButton
-        style={styles.deleteButton}
-        onDeletePress={() => deleteNote(data.item.id)}
-      />
-      <NoteListItem
-        style={styles.noteListItem}
-        onNoteListItemPress={() => handleNoteListItemPress(data.item)}
-        info={data.item}
-      />
-    </SwipeRow>
-  );
+  const renderItem = (data, rowMap) => {
+    if (!data.item.isDeleted) {
+      return (
+        <SwipeRow
+          rightOpenValue={-80}
+          leftOpenValue={0}
+          disableRightSwipe={true}
+          style={styles.noteRow}
+        >
+          <DeleteButton
+            style={styles.deleteButton}
+            onDeletePress={() => deleteNote(data.item.id)}
+          />
+          <NoteListItem
+            style={styles.noteListItem}
+            onNoteListItemPress={() => handleNoteListItemPress(data.item)}
+            info={data.item}
+          />
+        </SwipeRow>
+      );
+    } else return <></>;
+  };
   const keyExtractor = (item) => item.id;
   const handleBackPress = () => {
     navigation.goBack();

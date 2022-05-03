@@ -43,24 +43,32 @@ function Home({ navigation, folderList, deleteFolder, deleteNoteInFolder }) {
     deleteNoteInFolder(id);
     deleteFolder(id);
   };
-  const renderItem = (data, rowMap) => (
-    <SwipeRow
-      rightOpenValue={-80}
-      leftOpenValue={0}
-      disableRightSwipe={true}
-      style={styles.folderRow}
-    >
-      <DeleteButton
-        style={styles.deleteButton}
-        onDeletePress={() => handleDeleteFolder(data.item.id)}
-      />
-      <FolderListItem
-        style={styles.folderListItem}
-        onFolderListItemPress={() => handleFolderListItemPress(data.item.id)}
-        info={data.item}
-      />
-    </SwipeRow>
-  );
+  const renderItem = (data, rowMap) => {
+    if (!data.item.isDeleted) {
+      return (
+        <SwipeRow
+          rightOpenValue={-80}
+          leftOpenValue={0}
+          disableRightSwipe={true}
+          style={styles.folderRow}
+        >
+          <DeleteButton
+            style={styles.deleteButton}
+            onDeletePress={() => handleDeleteFolder(data.item.id)}
+          />
+          <FolderListItem
+            style={styles.folderListItem}
+            onFolderListItemPress={() =>
+              handleFolderListItemPress(data.item.id)
+            }
+            info={data.item}
+          />
+        </SwipeRow>
+      );
+    } else return <></>;
+  
+    
+  };
   const keyExtractor = (item) => item.id;
 
   return (

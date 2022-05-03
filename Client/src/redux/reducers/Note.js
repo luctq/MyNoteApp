@@ -21,10 +21,11 @@ const note = createSlice({
   reducers: {
     // các actions
     addNote(state, action) {
-      var lastId = state.noteList.length - 1;
-      if (state.noteList.length === 0) lastId = 0;
+      var lastId = 0;
+      if (state.noteList.length !== 0)
+        lastId = state.noteList[state.noteList.length - 1].id + 1;
       const newNote = {
-        id: state.noteList[lastId].id + 1,
+        id: lastId,
         folderId: action.payload.folderId,
         title: action.payload.title,
         content: action.payload.content,
@@ -36,12 +37,20 @@ const note = createSlice({
     },
     deleteNoteById(state, action) {
       state.noteList = state.noteList.filter(
-        (note, index) => note.id !== action.payload
+        (note, index) => {
+          if (note.id === action.payload) {
+            note.isDeleted = true;
+          }
+          return note;
+        }
       );
     },
     deleteNoteInFolderById(state, action) {
       state.noteList = state.noteList.filter((note, index) => {
-        return note.folderId !== action.payload;
+        if (note.folderId === action.payload) {
+          note.isDeleted = true;
+        }
+        return note;
       });
     },
     editNote(state, action) {},
@@ -59,7 +68,7 @@ export const createNewNote = (info) => (dispatch) => {
 export const deleteNote = (id) => (dispatch) => {
   dispatch(deleteNoteById(id));
   dispatch(decNoteCountById(id));
-}
+};
 
 export const deleteNoteInFolder = (folderId) => (dispatch) => {
   dispatch(deleteNoteInFolderById(folderId));

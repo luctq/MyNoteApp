@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  folderList: [{ id: 0, name: "Test Folder", noteCount: 1 }],
+  folderList: [{ id: 0, name: "Test Folder", noteCount: 1, isDeleted: false, deleteTime: null }],
 };
 
 const folder = createSlice({
@@ -10,18 +10,25 @@ const folder = createSlice({
   reducers: {
     // các actions
     addFolder(state, action) {
-      var lastId = state.folderList.length - 1;
-      if (state.folderList.length === 0) lastId = 0;
+      var lastId = 0;
+      if (state.folderList.length !== 0) lastId = state.folderList[state.folderList.length - 1].id + 1;
       const newFolder = {
-        id: state.folderList[lastId].id + 1, // lấy id của phần tử cuối cùng + 1
+        id: lastId, // lấy id của phần tử cuối cùng + 1
         name: action.payload.name,
         noteCount: 0,
+        isDeleted: false,
+        deleteTime: null,
       };
       state.folderList.push(newFolder);
     },
     deleteFolderById(state, action) {
       state.folderList = state.folderList.filter(
-        (folder, index) => folder.id !== action.payload
+        (folder, index) => {
+          if (folder.id === action.payload) {
+            folder.isDeleted = true;
+          }
+          return folder;
+        }
       );
     },
     editFolderNameById(state, action) {},

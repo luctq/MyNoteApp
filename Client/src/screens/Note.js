@@ -18,6 +18,8 @@ import { Audio } from 'expo-av'
 import * as FileSystem from 'expo-file-system'
 import FontAwesomeIcons from 'react-native-vector-icons/FontAwesome'
 import FoundationIcons from 'react-native-vector-icons/Foundation'
+import { connect } from "react-redux";
+
 
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
