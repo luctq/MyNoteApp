@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { incNoteCountById, decNoteCountById } from "./Folder";
 
 const initialState = {
   noteList: [
@@ -20,26 +21,48 @@ const note = createSlice({
   reducers: {
     // các actions
     addNote(state, action) {
+      var lastId = state.noteList.length - 1;
+      if (state.noteList.length === 0) lastId = 0;
       const newNote = {
-        id: state.noteList.length,
+        id: state.noteList[lastId].id + 1,
         folderId: action.payload.folderId,
         title: action.payload.title,
         content: action.payload.content,
         lastEdit: null,
-        isDeleted: false, 
-        deleteTime: null, 
+        isDeleted: false,
+        deleteTime: null,
       };
       state.noteList.push(newNote);
     },
-    deleteNote(state, action) {},
+    deleteNoteById(state, action) {
+      state.noteList = state.noteList.filter(
+        (note, index) => note.id !== action.payload
+      );
+    },
+    deleteNoteInFolderById(state, action) {
+      state.noteList = state.noteList.filter((note, index) => {
+        return note.folderId !== action.payload;
+      });
+    },
     editNote(state, action) {},
   },
 });
 
-const { addNote, deleteNote, editNote } = note.actions;
+export const { addNote, deleteNoteById, editNote, deleteNoteInFolderById } =
+  note.actions;
 
 export const createNewNote = (info) => (dispatch) => {
   dispatch(addNote(info));
+  dispatch(incNoteCountById(info.folderId));
+};
+
+export const deleteNote = (id) => (dispatch) => {
+  dispatch(deleteNoteById(id));
+  dispatch(decNoteCountById(id));
+}
+
+export const deleteNoteInFolder = (folderId) => (dispatch) => {
+  dispatch(deleteNoteInFolderById(folderId));
 };
 
 export default note.reducer;

@@ -13,13 +13,19 @@ import DeleteButton from "../components/DeleteButton";
 import DropDownOfFolder from "../components/DropDownOfFolder";
 import AntIcons from "react-native-vector-icons/AntDesign";
 
+import { deleteFolder } from "../redux/reducers/Folder";
+import { deleteNote, deleteNoteInFolder } from "../redux/reducers/Note";
+
 const mapStateToProps = (state) => ({
   folderList: state.folder.folderList,
 });
 
-const mapActionToProps = {};
+const mapActionToProps = {
+  deleteFolder,
+  deleteNoteInFolder,
+};
 
-function Home({ navigation, folderList }) {
+function Home({ navigation, folderList, deleteFolder, deleteNoteInFolder }) {
   const [isOpenDropDown, setIsOpenDropDown] = useState(false);
 
   const handlePressFolderIcon = () => {
@@ -34,6 +40,10 @@ function Home({ navigation, folderList }) {
   const handleFolderListItemPress = (id) => {
     navigation.navigate("Folder", { id });
   };
+  const handleDeleteFolder = (id) => {
+    deleteNoteInFolder(id);
+    deleteFolder(id);
+  };
   const renderItem = (data, rowMap) => (
     <SwipeRow
       rightOpenValue={-80}
@@ -41,7 +51,10 @@ function Home({ navigation, folderList }) {
       disableRightSwipe={true}
       style={styles.folderRow}
     >
-      <DeleteButton style={styles.deleteButton} />
+      <DeleteButton
+        style={styles.deleteButton}
+        onDeletePress={() => handleDeleteFolder(data.item.id)}
+      />
       <FolderListItem
         style={styles.folderListItem}
         onFolderListItemPress={() => handleFolderListItemPress(data.item.id)}

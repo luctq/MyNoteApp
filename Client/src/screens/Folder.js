@@ -10,6 +10,7 @@ import NoteListItem from '../components/NoteListItem'
 import AddNewNoteButton from '../components/AddNewNoteButton'
 import DeleteButton from '../components/DeleteButton'
 import BackButton from '../components/BackButton'
+import { deleteNote } from '../redux/reducers/Note';
 
 
 const mapStateToProps = (state) => ({
@@ -17,9 +18,10 @@ const mapStateToProps = (state) => ({
 });
 
 const mapActionToProps = {
+  deleteNote,
 };
 
-function Folder({ navigation, noteList, route }) {
+function Folder({ navigation, noteList, route, deleteNote }) {
   const id = route.params.id;
   const noteListInFolder = noteList.filter((note, index) => {
     return note.folderId === id;
@@ -31,7 +33,10 @@ function Folder({ navigation, noteList, route }) {
       disableRightSwipe={true}
       style={styles.noteRow}
     >
-      <DeleteButton style={styles.deleteButton} />
+      <DeleteButton
+        style={styles.deleteButton}
+        onDeletePress={() => deleteNote(data.item.id)}
+      />
       <NoteListItem
         style={styles.noteListItem}
         onNoteListItemPress={() => handleNoteListItemPress(data.item)}

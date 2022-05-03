@@ -18,7 +18,6 @@ function RecycleBin ({ navigation }) {
       <Text style={styles.note}>Các ghi chú được giữ trong thùng rác trong 30 ngày trước khi bị xóa vĩnh viễn</Text>
       <SearchBar style={styles.searchBar} />
       <NoteListItem style={styles.noteListItem}/>
-      <NoteListItem style={styles.noteListItem}/>
     </View>
   )
 }
