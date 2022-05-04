@@ -1,16 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  folderList: [
-    {
-      id: 0,
-      name: "Test Folder",
-      noteCount: 1,
-      isDeleted: false,
-      deleteTime: null,
-    },
-  ],
-  folderCount: 1, // số folder có isDeleted = false
+  folderList: [],
+  folderCount: 0, // số folder có isDeleted = false
 };
 
 const folder = createSlice({
@@ -30,7 +22,7 @@ const folder = createSlice({
         deleteTime: null,
       };
       state.folderList.push(newFolder);
-      state.folderCount ++;
+      state.folderCount++;
     },
     deleteFolderById(state, action) {
       state.folderList = state.folderList.filter((folder, index) => {
@@ -88,6 +80,6 @@ export const deleteFolder = (id) => (dispatch) => {
 
 export const restoreFolder = (id) => (dispatch) => {
   dispatch(restoreFolderById(id));
-}
+};
 
 export default folder.reducer;

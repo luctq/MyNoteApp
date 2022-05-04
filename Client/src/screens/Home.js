@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
-import Constants from 'expo-constants'
-import { connect } from 'react-redux'
+import { useState } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
+import Constants from "expo-constants";
+import { connect } from "react-redux";
 
 import SettingButton from "../components/SettingButton";
 import SearchBar from "../components/SearchBar";
@@ -25,8 +25,15 @@ const mapActionToProps = {
   deleteNoteInFolder,
 };
 
-function Home({ navigation, folderList, folderCount, deleteFolder, deleteNoteInFolder }) {
+function Home({
+  navigation,
+  folderList,
+  folderCount,
+  deleteFolder,
+  deleteNoteInFolder,
+}) {
   const [isOpenDropDown, setIsOpenDropDown] = useState(false);
+  const [textSearch, setTextSearch] = useState("");
 
   const handlePressFolderIcon = () => {
     setIsOpenDropDown(!isOpenDropDown);
@@ -45,7 +52,10 @@ function Home({ navigation, folderList, folderCount, deleteFolder, deleteNoteInF
     deleteFolder(id);
   };
   const renderItem = (data, rowMap) => {
-    if (!data.item.isDeleted) {
+    if (
+      !data.item.isDeleted &&
+      data.item.name.toLowerCase().includes(textSearch.toLowerCase())
+    ) {
       return (
         <SwipeRow
           rightOpenValue={-80}
@@ -67,8 +77,6 @@ function Home({ navigation, folderList, folderCount, deleteFolder, deleteNoteInF
         </SwipeRow>
       );
     } else return <></>;
-  
-    
   };
   const keyExtractor = (item) => item.id;
 
@@ -91,7 +99,7 @@ function Home({ navigation, folderList, folderCount, deleteFolder, deleteNoteInF
         </View>
         <CheckButton style={styles.checkButton} />
       </View>
-      <SearchBar style={styles.searchBar} />
+      <SearchBar style={styles.searchBar} textSearch={textSearch} setTextSearch={setTextSearch} />
       {folderCount === 0 ? (
         <View>
           <Image
