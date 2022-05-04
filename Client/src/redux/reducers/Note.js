@@ -2,17 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { incNoteCountById, decNoteCountById } from "./Folder";
 
 const initialState = {
-  noteList: [
-    {
-      id: 0,
-      folderId: 0,
-      title: "Test",
-      content: "Nội dung skgdbá kdg ksdfk sdkf sbkdjhvvhvh...",
-      lastEdit: "",
-      isDeleted: false,
-      deleteTime: "",
-    },
-  ],
+  noteList: [],
 };
 
 const note = createSlice({
@@ -112,6 +102,6 @@ export const updateNote = (note) => (dispatch) => {
 
 export const expulsionNote = (id) => (dispatch) => {
   dispatch(expulsionNoteById(id));
-}
+};
 
 export default note.reducer;

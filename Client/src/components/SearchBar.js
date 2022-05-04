@@ -3,9 +3,7 @@ import React, {useState} from 'react';
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 
-export default function SearchBar({style}) {
-
-  const [textSearch, setTextSearch] = useState("");
+export default function SearchBar({style, textSearch, setTextSearch}) {
   
   return (
     <View style={style}>
@@ -13,7 +11,7 @@ export default function SearchBar({style}) {
         <Ionicons name="search" size={25} color="black" style={styles.icon} />
         <TextInput
           value={textSearch}
-          placeholder="Tìm kiếm ghi chú"
+          placeholder="Tìm kiếm ..."
           onChangeText={(text) => setTextSearch(text)}
           placeholderTextColor={"gray"}
           style={styles.searchInput}

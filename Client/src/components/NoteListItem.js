@@ -3,14 +3,21 @@ import React, { useState } from "react";
 import DateTime from "./DateTime";
 
 export default function NoteListItem({ style, onNoteListItemPress, info }) {
+  // const getNoteTitle = (noteContent) => {
+  //   if (!noteContent || noteContent.length <= 30) {
+  //     return noteContent;
+  //   }
+  //   return noteContent.slice(0, 30) + "...";
+  // };
 
-  const getNoteTitle = (noteContent) => {
-    const regex = /(<\w+>)+([-/:;()&@"\.,?!'₫1234567890aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ\s]+)/
-    const match = regex.exec(noteContent);
-    if (match !== null) {
-      return match[match.length - 1]
-    }
-  }
+   const getNoteTitle = (noteContent) => {
+     const regex =
+       /(<\w+>)+([-/:;()&@"\.,?!'₫1234567890aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ\s]+)/;
+     const match = regex.exec(noteContent);
+     if (match !== null) {
+       return match[match.length - 1];
+     }
+   };
 
   return (
     <View style={style}>
