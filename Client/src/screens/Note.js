@@ -5,7 +5,8 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
-  Dimensions
+  Dimensions,
+  LogBox
 } from 'react-native'
 import {
   actions,
@@ -18,7 +19,9 @@ import { Audio } from 'expo-av'
 import * as FileSystem from 'expo-file-system'
 import FontAwesomeIcons from 'react-native-vector-icons/FontAwesome'
 import FoundationIcons from 'react-native-vector-icons/Foundation'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { connect } from "react-redux";
+
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
 import ThreeDotButton from '../components/ThreeDotButton'
@@ -31,11 +34,14 @@ import {
   expulsionNote,
 } from "../redux/reducers/Note";
 import ChangeBackgroundModal from '../components/ChangeBackgroundModal'
-const screen = Dimensions.get('window')
 
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+])
+
+const screen = Dimensions.get('window')
 const mapStateToProps = (state) => ({
 });
-
 const mapActionToProps = {
   createNewNote,
   updateNote,
@@ -43,6 +49,7 @@ const mapActionToProps = {
 };
 
 function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
+
   const note = route.params.item;
   const isNew = route.params.isNew;
   const [isOpen, setIsOpen] = useState(false);
@@ -58,6 +65,8 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   const richText = useRef();
   const editorView = useRef();
   const [isOpenModalChangeBackground, setIsOpenModalChangeBackground] = useState(false)
+  const [signature, setSign] = useState(null)
+
   const handleNoteTitleChange = (noteTitle) => {
     setNoteTitle(noteTitle);
   };
@@ -70,6 +79,20 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   const handlePressChangeBackgroundIcon = () => {
     setIsOpenModalChangeBackground(!isOpenModalChangeBackground)
   };
+  const handlePressDraw = () => {
+    navigation.navigate('Draw', {
+      handleOK,
+      handleEmpty
+    })
+  }
+  const handleOK = (signature) => {
+    setSign(signature)
+    richText.current.insertImage(signature)
+    navigation.goBack()
+  }
+  const handleEmpty = () => {
+    navigation.goBack()
+  }
   const handleBackPress = () => {
     if (!isNew) {
       if (noteContent === "" && noteTitle === "") expulsionNote(note.id);
@@ -146,6 +169,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
     `
     );
   });
+
   return (
     <View style={styles.container}>
       <BackButton style={styles.backButton} onBackPress={handleBackPress} />
@@ -184,6 +208,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
             actions.insertImage,
             "insertVoice",
             "launchCamera",
+            "draw",
             actions.keyboard,
             actions.setBold,
             actions.setItalic,
@@ -209,11 +234,15 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
             launchCamera: ({ tintColor }) => (
               <FontAwesomeIcons name="camera" size={20} color={tintColor} />
             ),
+            draw: ({ tintColor }) => (
+              <MaterialCommunityIcons name='draw' size={25} color={tintColor} />
+            )
           }}
           style={[styles.richToolBar, { bottom: proFocus.bottom }]}
           onPressAddImage={handlePressAddImage}
           insertVoice={recording ? handleStopRecording : handleInsertVoice}
           launchCamera={handleLaunchCamera}
+          draw={handlePressDraw}
         />
         <ScrollView
           style={[styles.editorView, { height: proFocus.height }]}
@@ -256,7 +285,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f7f7f7',
     flex: 1,
-    paddingHorizontal: 25,
+    paddingHorizontal: 5,
   },
   headerIcon: {
     flexDirection: 'row',
@@ -275,11 +304,10 @@ const styles = StyleSheet.create({
     marginTop: Constants.statusBarHeight + 50,
     fontSize: 22,
     fontWeight: 'bold',
+    paddingLeft: 10
   },
   noteContent: {},
   editorView: {
-    // borderColor: 'red',
-    // borderWidth: 1
   },
   backButton: {
     position: 'absolute',
