@@ -9,6 +9,7 @@ import RecycleBin from '../screens/RecycleBin'
 import Register from '../screens/Register'
 import Settings from '../screens/Settings'
 import TodoList from '../screens/TodoList'
+import Draw from '../screens/Draw'
 
 const Stack = createNativeStackNavigator()
 
@@ -69,6 +70,13 @@ function Router () {
         <Stack.Screen 
           name='TodoList'
           component={TodoList}
+        />
+        <Stack.Screen 
+          name='Draw'
+          component={Draw}
+          options={{
+            headerShown: false
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
