@@ -8,7 +8,7 @@ function CompleteButton({ style, onButtonPress }) {
         style={styles.container} 
         onPress={onButtonPress}
       >
-        <Text style={styles.text}>Xong</Text>
+        <Text style={[styles.text, style]}>Xong</Text>
       </TouchableOpacity>
     </View>
   )

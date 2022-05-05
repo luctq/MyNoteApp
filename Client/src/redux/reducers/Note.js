@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { incNoteCountById, decNoteCountById } from "./Folder";
-
+import { dark, light, pink, yellow } from "../../themes/themes";
 const initialState = {
   noteList: [],
+  theme: light,
 };
 
 const note = createSlice({
@@ -65,6 +66,9 @@ const note = createSlice({
         (note, index) => note.id !== action.payload
       );
     },
+    changeThemeScreen(state, action) {
+      state.theme = action.payload
+    },
   },
 });
 
@@ -75,7 +79,21 @@ export const {
   editNote,
   deleteNoteInFolderById,
   expulsionNoteById,
+  changeThemeScreen
 } = note.actions;
+
+export const changeTheme = (theme) => (dispatch) => {
+  console.log(theme)
+  if (theme == "light") {
+    dispatch(changeThemeScreen(light))
+  } else if (theme == "dark") {
+    dispatch(changeThemeScreen(dark))
+  } else if (theme == "yellow") {
+    dispatch(changeThemeScreen(yellow))
+  } else if (theme == "pink") {
+    dispatch(changeThemeScreen(pink))
+  }
+}
 
 export const createNewNote = (info) => (dispatch) => {
   dispatch(addNote(info));

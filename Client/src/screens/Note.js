@@ -44,6 +44,7 @@ LogBox.ignoreLogs([
 
 const screen = Dimensions.get('window')
 const mapStateToProps = (state) => ({
+  theme: state.note.theme
 });
 const mapActionToProps = {
   createNewNote,
@@ -51,8 +52,7 @@ const mapActionToProps = {
   expulsionNote,
 };
 
-function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
-
+function Note({ navigation, route, createNewNote, updateNote, expulsionNote, theme }) {
   const note = route.params.item;
   const isNew = route.params.isNew;
   const folderName = route.params.folderName;
@@ -211,11 +211,11 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.backButton}>
-        <BackButton onBackPress={handleBackPress} />
+    <View style={styles.container(theme)}>
+      <View style={styles.backButton(theme)}>
+        <BackButton iconColor={theme.text} onBackPress={handleBackPress} />
         <TouchableOpacity onPress={handleBackPress}>
-          <Text style={styles.folderName}>{folderName}</Text>
+          <Text style={styles.folderName(theme)}>{folderName}</Text>
         </TouchableOpacity>
       </View>
       <ChangeBackgroundModal isOpen={isOpenModalChangeBackground} onClosed={() => setIsOpenModalChangeBackground(false)}/>
@@ -224,31 +224,37 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
         setIsOpen={() => handlePressFolderIcon()}
       />
       <ShareFormModal isOpen={isOpen} isClosed={() => setIsOpen(false)} />
-      <View style={styles.headerIcon}>
+      <View style={styles.headerIcon(theme)}>
         <ShareButton
-          style={styles.shareButton}
+          iconColor={theme.text}
+          style={styles.shareButton(theme)}
           handlePress={() => setIsOpen(!isOpen)}
           isDisable={proFocus.isDisableButton}
         />
         <ChangeBackgroundButton
-          style={styles.changeBackgroundButton}
+          iconColor={theme.text}
+          style={styles.changeBackgroundButton(theme)}
           onButtonChangeBackground={handlePressChangeBackgroundIcon}
           isDisable={proFocus.isDisableButton}
         />
         <ThreeDotButton
+          iconColor={theme.text}
+          style={styles.threeDotButton(theme)}
           onButtonPress={handlePressFolderIcon}
           isDisable={proFocus.isDisableButton}
         />
         <CompleteButton
           onButtonPress={handlePressComplete}
-          style={{display: proFocus.isDisableButton === false ? 'none' : 'flex'}}
+          style={{display: proFocus.isDisableButton === false ? 'none' : 'flex',  backgroundColor: theme.background,
+          color: theme.text}}
         />
       </View>
       <TextInput
         placeholder="Write title..."
+        placeholderTextColor={theme.text}
         value={noteTitle}
         onChangeText={handleNoteTitleChange}
-        style={styles.titleNote}
+        style={styles.titleNote(theme)}
       />
       <View style={{}}>
         <RichToolbar
@@ -281,7 +287,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
               <Ionicons name='close' size={25} color={tintColor} />
             )
           }}
-          style={[styles.richToolBar, { bottom: proFocus.bottom }]}
+          style={[styles.richToolBar(theme), { bottom: proFocus.bottom }]}
           onPressAddImage={handlePressAddImage}
           insertVoice={recording ? handleStopRecording : handleInsertVoice}
           launchCamera={handleLaunchCamera}
@@ -290,7 +296,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
           close={handleCloseTextTool}
         />
         <ScrollView
-          style={[styles.editorView, { height: proFocus.height }]}
+          style={[styles.editorView(theme), { height: proFocus.height }]}
           ref={editorView}
           onContentSizeChange={() =>
             editorView.current.scrollToEnd({ animated: true })
@@ -302,8 +308,10 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
             onChange={(text) => {
               handleNoteContentChange(text);
             }}
-            editorStyle={{ backgroundColor: "#f7f7f7" }}
+            editorStyle={{ backgroundColor: theme.background,
+              color: theme.text, }}
             placeholder="Type something here..."
+            placeholderTextColor={theme.text}
             style={styles.richEditor}
             onFocus={() => {
               setProFocus({
@@ -327,56 +335,75 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#f7f7f7',
+  container: theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
     flex: 1,
     paddingHorizontal: 5,
-  },
-  headerIcon: {
+  }),
+  headerIcon: theme =>  ({
+    backgroundColor: theme.background,
+    color: theme.text,
     flexDirection: 'row',
     position: 'absolute',
     top: Constants.statusBarHeight + 5,
     right: 6,
     alignItems: 'center',
-  },
-  shareButton: {
+  }),
+  shareButton:theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
     paddingHorizontal: 10,
-  },
-  changeBackgroundButton: {
+  }),
+  changeBackgroundButton: theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
     paddingHorizontal: 10,
-  },
-  threeDotButton: {},
-  titleNote: {
+  }),
+  threeDotButton: theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
+  }),
+  titleNote: theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
     marginTop: Constants.statusBarHeight + 50,
     fontSize: 22,
     fontWeight: 'bold',
     paddingLeft: 10
-  },
+  }),
   noteContent: {},
-  editorView: {
-  },
-  backButton: {
+  editorView: theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
+  }),
+  backButton: theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
     position: 'absolute',
     top: Constants.statusBarHeight + 5,
     left: 6,
     flexDirection: 'row',
     alignItems: 'center'
-  },
-  richToolBar: {
-    backgroundColor: '#f7f7f7', 
+  }),
+  richToolBar: theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
     position: 'absolute',
     zIndex: 1,
     width: '100%'
     // borderColor: 'pink',
     // borderWidth: 1
-  },
+  }),
   richEditor: {
     // borderColor: 'green',
     // borderWidth: 1
   },
-  folderName: {
+  folderName: theme => ({
+    backgroundColor: theme.background,
+    color: theme.text,
     fontSize: 16
-  }
+  })
 })
 
 export default connect(mapStateToProps, mapActionToProps)(Note);
