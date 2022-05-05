@@ -3,6 +3,7 @@ import { auth } from './firebase.js';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth';
 const user = express.Router();
 
@@ -11,8 +12,13 @@ user.post('/signup', (req, res) => {
     .catch((error) => res.send(error))
     .then((userCredentials) => {
       const user = userCredentials.user;
-      res.cookie('auth', true, { expires: new Date(Date.now() + 3600000) });
-      res.send('success');
+      console.log(user);
+      res
+        .cookie('auth', true, {
+          maxAge: 1000 * 60 * 60,
+          httpOnly: true,
+        })
+        .send('success');
     })
     .catch((error) => {
       res.send(error);
@@ -26,12 +32,25 @@ user.post('/signin', (req, res) => {
     })
     .then((userCredentials) => {
       const user = userCredentials.user;
-      res.cookie('auth', true, { expires: new Date(Date.now() + 3600000) });
-      res.send('success');
+      console.log(user);
+      res
+        .cookie('auth', true, {
+          maxAge: 1000 * 60 * 60,
+          httpOnly: true,
+        })
+        .send('success');
     })
     .catch((error) => {
       res.send(error);
     });
+});
+
+user.get('/signout', (req, res) => {
+  signOut(auth)
+    .then(() => {
+      res.clearCookie('auth').send('success');
+    })
+    .catch((error) => res.send(error));
 });
 
 export { user };

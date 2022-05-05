@@ -12,7 +12,9 @@ app.get('/', (req, res) => {
   if (req.cookies.auth) {
     res.send(`found cookie: ${req.cookies.auth} `);
   } else {
-    res.send('cant find cookie');
+    res
+      .cookie('hello', 'world', { maxAge: 1000 * 60 })
+      .send('cant find cookie');
   }
 });
 
