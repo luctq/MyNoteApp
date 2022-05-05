@@ -58,7 +58,7 @@ function Folder({ navigation, noteList, route, deleteNote }) {
     navigation.goBack();
   };
   const handleNoteListItemPress = (item) => {
-    navigation.navigate("Note", { item, isNew: false });
+    navigation.navigate("Note", { item, isNew: false, folderName: name, });
   };
   const handleAddNewNotePress = () => {
     navigation.navigate("Note", {
@@ -72,6 +72,7 @@ function Folder({ navigation, noteList, route, deleteNote }) {
         deleteTime: null,
       },
       isNew: true,
+      folderName: name,
     });
   };
 
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
   backButton: {
     position: "absolute",
     top: Constants.statusBarHeight + 5,
-    left: 15,
+    left: 6,
   },
 });
 

@@ -6,7 +6,8 @@ import {
   TextInput,
   ScrollView,
   Dimensions,
-  LogBox
+  LogBox,
+  TouchableOpacity
 } from 'react-native'
 import {
   actions,
@@ -20,6 +21,7 @@ import * as FileSystem from 'expo-file-system'
 import FontAwesomeIcons from 'react-native-vector-icons/FontAwesome'
 import FoundationIcons from 'react-native-vector-icons/Foundation'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { connect } from "react-redux";
 
 import ShareButton from '../components/ShareButton'
@@ -28,6 +30,7 @@ import ThreeDotButton from '../components/ThreeDotButton'
 import ShareFormModal from '../components/ShareFormModal'
 import DropDownOfThreeDot from '../components/DropDownOfThreeDot'
 import BackButton from '../components/BackButton'
+import CompleteButton from '../components/CompleteButton'
 import {
   createNewNote,
   updateNote,
@@ -52,20 +55,27 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
 
   const note = route.params.item;
   const isNew = route.params.isNew;
+  const folderName = route.params.folderName;
   const [isOpen, setIsOpen] = useState(false);
   const [proFocus, setProFocus] = useState({
     height: screen.height - Constants.statusBarHeight - 80,
     bottom: -40,
+    isDisableButton: false
   });
   const [noteTitle, setNoteTitle] = useState(note.title);
   const [noteContent, setNoteContent] = useState(note.content);
   const [isOpenDropDown, setIsOpenDropDown] = useState(false);
-  const [isDisableButton, setIsDisableButton] = useState(false);
   const [recording, setRecording] = useState();
   const richText = useRef();
   const editorView = useRef();
   const [isOpenModalChangeBackground, setIsOpenModalChangeBackground] = useState(false)
-  const [signature, setSign] = useState(null)
+  const [actionsToolbar, setActionsToolbar] = useState([
+    actions.insertImage,
+    "insertVoice",
+    "launchCamera",
+    "draw",
+    'editText',
+  ])
 
   const handleNoteTitleChange = (noteTitle) => {
     setNoteTitle(noteTitle);
@@ -79,6 +89,9 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   const handlePressChangeBackgroundIcon = () => {
     setIsOpenModalChangeBackground(!isOpenModalChangeBackground)
   };
+  const handlePressComplete = () => {
+    richText.current.dismissKeyboard()
+  }
   const handlePressDraw = () => {
     navigation.navigate('Draw', {
       handleOK,
@@ -86,8 +99,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
     })
   }
   const handleOK = (signature) => {
-    setSign(signature)
-    richText.current.insertImage(signature)
+    richText.current.insertImage(signature, 'border: 1px solid #ddd;')
     navigation.goBack()
   }
   const handleEmpty = () => {
@@ -169,10 +181,43 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
     `
     );
   });
+  const handlePressEditText = () => {
+    setActionsToolbar([
+      'close',
+      actions.setBold,
+      actions.setItalic,
+      actions.setUnderline,
+      actions.heading1,
+      actions.code,
+      actions.insertBulletsList,
+      actions.insertOrderedList,
+      actions.blockquote,
+      actions.line,
+      actions.setSubscript,
+      actions.setSuperscript,
+      actions.alignLeft,
+      actions.alignCenter,
+      actions.alignRight,
+    ])
+  }
+  const handleCloseTextTool = () => {
+    setActionsToolbar([
+      actions.insertImage,
+      "insertVoice",
+      "launchCamera",
+      "draw",
+      'editText',
+    ])
+  }
 
   return (
     <View style={styles.container}>
-      <BackButton style={styles.backButton} onBackPress={handleBackPress} />
+      <View style={styles.backButton}>
+        <BackButton onBackPress={handleBackPress} />
+        <TouchableOpacity onPress={handleBackPress}>
+          <Text style={styles.folderName}>{folderName}</Text>
+        </TouchableOpacity>
+      </View>
       <ChangeBackgroundModal isOpen={isOpenModalChangeBackground} onClosed={() => setIsOpenModalChangeBackground(false)}/>
       <DropDownOfThreeDot
         isOpen={isOpenDropDown}
@@ -183,16 +228,20 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
         <ShareButton
           style={styles.shareButton}
           handlePress={() => setIsOpen(!isOpen)}
-          isDisable={isDisableButton}
+          isDisable={proFocus.isDisableButton}
         />
         <ChangeBackgroundButton
           style={styles.changeBackgroundButton}
           onButtonChangeBackground={handlePressChangeBackgroundIcon}
-          isDisable={isDisableButton}
+          isDisable={proFocus.isDisableButton}
         />
         <ThreeDotButton
           onButtonPress={handlePressFolderIcon}
-          isDisable={isDisableButton}
+          isDisable={proFocus.isDisableButton}
+        />
+        <CompleteButton
+          onButtonPress={handlePressComplete}
+          style={{display: proFocus.isDisableButton === false ? 'none' : 'flex'}}
         />
       </View>
       <TextInput
@@ -204,19 +253,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
       <View style={{}}>
         <RichToolbar
           editor={richText}
-          actions={[
-            actions.insertImage,
-            "insertVoice",
-            "launchCamera",
-            "draw",
-            actions.keyboard,
-            actions.setBold,
-            actions.setItalic,
-            actions.setUnderline,
-            actions.heading1,
-            actions.insertBulletsList,
-            actions.insertOrderedList,
-          ]}
+          actions={actionsToolbar}
           iconMap={{
             [actions.heading1]: ({ tintColor }) => (
               <Text style={[{ color: tintColor }]}>H1</Text>
@@ -236,6 +273,12 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
             ),
             draw: ({ tintColor }) => (
               <MaterialCommunityIcons name='draw' size={25} color={tintColor} />
+            ),
+            editText: ({ tintColor }) => (
+              <Ionicons name='text' size={25} color={tintColor} />
+            ),
+            close: ({ tintColor }) => (
+              <Ionicons name='close' size={25} color={tintColor} />
             )
           }}
           style={[styles.richToolBar, { bottom: proFocus.bottom }]}
@@ -243,6 +286,8 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
           insertVoice={recording ? handleStopRecording : handleInsertVoice}
           launchCamera={handleLaunchCamera}
           draw={handlePressDraw}
+          editText={handlePressEditText}
+          close={handleCloseTextTool}
         />
         <ScrollView
           style={[styles.editorView, { height: proFocus.height }]}
@@ -264,15 +309,15 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
               setProFocus({
                 height: screen.height - Constants.statusBarHeight - 80 - 248,
                 bottom: -36,
+                isDisableButton: true
               });
-              setIsDisableButton(true);
             }}
             onBlur={() => {
               setProFocus({
                 height: screen.height - Constants.statusBarHeight - 80,
                 bottom: -40,
+                isDisableButton: false
               });
-              setIsDisableButton(false);
             }}
           />
         </ScrollView>
@@ -291,7 +336,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     top: Constants.statusBarHeight + 5,
-    right: 15,
+    right: 6,
+    alignItems: 'center',
   },
   shareButton: {
     paddingHorizontal: 10,
@@ -312,12 +358,15 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute',
     top: Constants.statusBarHeight + 5,
-    left: 15
+    left: 6,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   richToolBar: {
     backgroundColor: '#f7f7f7', 
     position: 'absolute',
     zIndex: 1,
+    width: '100%'
     // borderColor: 'pink',
     // borderWidth: 1
   },
@@ -325,6 +374,9 @@ const styles = StyleSheet.create({
     // borderColor: 'green',
     // borderWidth: 1
   },
+  folderName: {
+    fontSize: 16
+  }
 })
 
 export default connect(mapStateToProps, mapActionToProps)(Note);

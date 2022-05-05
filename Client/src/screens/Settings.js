@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   backButton: {
     position: "absolute",
     top: Constants.statusBarHeight + 5,
-    left: 15,
+    left: 6,
   },
   header: {
     fontSize: 35,

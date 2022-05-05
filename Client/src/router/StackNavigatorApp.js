@@ -75,7 +75,8 @@ function Router () {
           name='Draw'
           component={Draw}
           options={{
-            headerShown: false
+            headerShown: false,
+            animation: 'fade_from_bottom'
           }}
         />
       </Stack.Navigator>

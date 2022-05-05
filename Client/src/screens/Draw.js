@@ -6,12 +6,19 @@ import Constants from 'expo-constants'
 const style = `
   .m-signature-pad--footer
   .button {
-    background-color: red;
     color: #FFF;
     font-size: 18px;
   }
+  .m-signature-pad--footer
+  .button.save {
+    background-color: green;
+  }
+  .m-signature-pad--footer
+  .button.clear {
+    background-color: red;
+  }
   .m-signature-pad {
-    height: 400px;
+    height: 570px;
   }
 `
 
