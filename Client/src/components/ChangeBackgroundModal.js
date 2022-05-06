@@ -9,12 +9,13 @@ import {
   ScrollView,
 } from "react-native";
 import moment from "moment";
+import { connect } from "react-redux";
 import Modal from "react-native-modalbox";
 import { DatePicker } from "react-native-common-date-picker";
-
+import { changeTheme } from "../redux/reducers/Note";
 import { LogBox } from "react-native";
 var screen = Dimensions.get("window");
-export default function ChangeBackgroundModal(props) {
+function ChangeBackgroundModal(props) {
   const ref = useRef();
   const openModal = () => {
     ref.current.open();
@@ -32,28 +33,45 @@ export default function ChangeBackgroundModal(props) {
       onClosed={props.onClosed}
     >
       <Pressable
-          style={{ height: 120, width: 90, backgroundColor: 'black', borderRadius: 20}}
-          onPress={() => console.log('1')}
+          style={{ height: 120, width: 90, backgroundColor: '#ededed', borderRadius: 20}}
+          onPress={() => {
+            props.changeTheme("light");
+            props.onClosed();
+          }}
         >
       </Pressable>
       <Pressable
-          style={{ height: 120, width: 90, backgroundColor: 'blue', borderRadius: 20}}
-          onPress={() => console.log('1')}
+          style={{ height: 120, width: 90, backgroundColor: '#2E3440', borderRadius: 20}}
+          onPress={() => {
+            props.changeTheme("dark");
+            props.onClosed();
+          }}
         >
       </Pressable>
       <Pressable
-          style={{ height: 120, width: 90, backgroundColor: 'red', borderRadius: 20}}
-          onPress={() => console.log('1')}
+          style={{ height: 120, width: 90, backgroundColor: '#ffd966', borderRadius: 20}}
+          onPress={() => {
+            props.changeTheme("yellow");
+            props.onClosed();
+          }}
         >
       </Pressable>
       <Pressable
-          style={{ height: 120, width: 90, backgroundColor: 'yellow', borderRadius: 20}}
-          onPress={() => console.log('1')}
+          style={{ height: 120, width: 90, backgroundColor: '#ff6379', borderRadius: 20}}
+          onPress={() => {
+            props.changeTheme("pink");
+            props.onClosed();
+          }}
         >
       </Pressable>
     </Modal>
   );
 }
+const mapStateToProps = (state) => ({
+});
+const mapActionToProps = {
+  changeTheme,
+};
 /** How to use?
  *
  *  const [isOpen, setIsOpen] = useState(false)
@@ -73,3 +91,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10
   }
 });
+export default connect(mapStateToProps, mapActionToProps)(ChangeBackgroundModal);

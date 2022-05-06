@@ -1,7 +1,7 @@
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-function BackButton({ style, onBackPress }) {
+function BackButton({ style, onBackPress, iconColor }) {
 
   return (
     <View style={style}>
@@ -12,7 +12,7 @@ function BackButton({ style, onBackPress }) {
         <Ionicons 
           name="arrow-back"
           size={30}
-          color="#000"
+          color={iconColor}
         />
       </TouchableOpacity>
     </View>
