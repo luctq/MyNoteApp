@@ -30,6 +30,7 @@
     "react-native": "0.64.3",
     "react-native-common-date-picker": "^2.3.7",
     "react-native-datepicker": "^1.7.2",
+    "react-native-flash-message": "^0.2.1",
     "react-native-modal-dropdown": "^1.0.2",
     "react-native-modalbox": "^2.0.2",
     "react-native-pell-rich-editor": "^1.8.8",

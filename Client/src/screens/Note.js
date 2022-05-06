@@ -7,7 +7,8 @@ import {
   ScrollView,
   Dimensions,
   LogBox,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform,
 } from 'react-native'
 import {
   actions,
@@ -23,6 +24,7 @@ import FoundationIcons from 'react-native-vector-icons/Foundation'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { connect } from "react-redux";
+import FlashMessage, { showMessage } from 'react-native-flash-message'
 
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
@@ -58,8 +60,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   const folderName = route.params.folderName;
   const [isOpen, setIsOpen] = useState(false);
   const [proFocus, setProFocus] = useState({
-    height: screen.height - Constants.statusBarHeight - 80,
-    bottom: -40,
+    height: screen.height - 96.5,
     isDisableButton: false
   });
   const [noteTitle, setNoteTitle] = useState(note.title);
@@ -76,6 +77,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
     "draw",
     'editText',
   ])
+  const keyboardHeight = Platform.OS === 'ios' ? 216 : 216
 
   const handleNoteTitleChange = (noteTitle) => {
     setNoteTitle(noteTitle);
@@ -89,7 +91,11 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   const handlePressChangeBackgroundIcon = () => {
     setIsOpenModalChangeBackground(!isOpenModalChangeBackground)
   };
-  const handlePressComplete = () => {
+  const handlePressComplete = async () => {
+    if (recording) {
+      setRecording(undefined)
+      await recording.stopAndUnloadAsync()
+    }
     richText.current.dismissKeyboard()
   }
   const handlePressDraw = () => {
@@ -105,7 +111,10 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   const handleEmpty = () => {
     navigation.goBack()
   }
-  const handleBackPress = () => {
+  const handleBackPress = async () => {
+    if (recording) {
+      await recording.stopAndUnloadAsync()
+    }
     if (!isNew) {
       if (noteContent === "" && noteTitle === "") expulsionNote(note.id);
       else updateNote({ ...note, title: noteTitle, content: noteContent });
@@ -147,24 +156,30 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
   });
   const handleInsertVoice = useCallback(async () => {
     try {
-      console.log("Requesting permissions..");
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      console.log("Starting recording..");
       const { recording } = await Audio.Recording.createAsync(
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
       );
       setRecording(recording);
-      console.log("Recording started");
+      showMessage({
+        message: 'Đã bắt đầu ghi âm!',
+        description: 'Nhấn một lần nữa để dừng!',
+        type: 'info',
+        duration: 2000
+      })
     } catch (err) {
-      console.error("Failed to start recording", err);
+      showMessage({
+        message: 'Ghi âm thất bại!',
+        type: 'danger',
+        duration: 2000
+      })
     }
   });
   const handleStopRecording = useCallback(async () => {
-    console.log("Stopping recording..");
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
@@ -180,6 +195,11 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
       </div>
     `
     );
+    showMessage({
+      message: 'Ghi âm hoàn tất!',
+      type: 'success',
+      duration: 2000
+    })
   });
   const handlePressEditText = () => {
     setActionsToolbar([
@@ -208,6 +228,18 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
       "draw",
       'editText',
     ])
+  }
+  const handleEditorFocus = () => {
+    setProFocus({
+      height: screen.height - 96.5 - keyboardHeight - 44,
+      isDisableButton: true
+    })
+  }
+  const handleEditorBlur = async () => {
+    setProFocus({
+      height: screen.height - 96.5,
+      isDisableButton: false
+    })
   }
 
   return (
@@ -245,12 +277,12 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
         />
       </View>
       <TextInput
-        placeholder="Write title..."
+        placeholder="Gõ tiêu đề..."
         value={noteTitle}
         onChangeText={handleNoteTitleChange}
         style={styles.titleNote}
       />
-      <View style={{}}>
+      <View>
         <RichToolbar
           editor={richText}
           actions={actionsToolbar}
@@ -281,7 +313,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
               <Ionicons name='close' size={25} color={tintColor} />
             )
           }}
-          style={[styles.richToolBar, { bottom: proFocus.bottom }]}
+          style={[styles.richToolBar, { bottom: -44 }]}
           onPressAddImage={handlePressAddImage}
           insertVoice={recording ? handleStopRecording : handleInsertVoice}
           launchCamera={handleLaunchCamera}
@@ -303,28 +335,21 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote }) {
               handleNoteContentChange(text);
             }}
             editorStyle={{ backgroundColor: "#f7f7f7" }}
-            placeholder="Type something here..."
+            placeholder="Gõ nội dung..."
             style={styles.richEditor}
-            onFocus={() => {
-              setProFocus({
-                height: screen.height - Constants.statusBarHeight - 80 - 248,
-                bottom: -36,
-                isDisableButton: true
-              });
-            }}
-            onBlur={() => {
-              setProFocus({
-                height: screen.height - Constants.statusBarHeight - 80,
-                bottom: -40,
-                isDisableButton: false
-              });
-            }}
+            onFocus={handleEditorFocus}
+            onBlur={handleEditorBlur}
           />
         </ScrollView>
       </View>
+      <FlashMessage position='top' />
     </View>
   );
 }
+
+// = 70 + 26.5(const)
+// keyboard = 216
+// tool 44(const)
 
 const styles = StyleSheet.create({
   container: {
@@ -354,6 +379,8 @@ const styles = StyleSheet.create({
   },
   noteContent: {},
   editorView: {
+    // borderWidth: 1,
+    // borderColor: 'red'
   },
   backButton: {
     position: 'absolute',
@@ -366,8 +393,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f7f7', 
     position: 'absolute',
     zIndex: 1,
-    width: '100%'
-    // borderColor: 'pink',
+    width: '100%',
+    // borderColor: 'yellow',
     // borderWidth: 1
   },
   richEditor: {

@@ -42,12 +42,9 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#FFFFFF",
     borderRadius: 15,
-    // width: "80%",
-    paddingLeft: 20,
-    paddingTop: 10,
-    paddingBottom: 5,
-    // marginTop: 20,
-    maxHeight: 100,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    minHeight: 86
   },
   title: {
     fontWeight: "bold",
