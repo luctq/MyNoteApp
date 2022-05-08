@@ -32,7 +32,7 @@ export default function NoteListItem({ style, onNoteListItemPress, info }) {
         ) : (
           <></>
         )}
-        <DateTime style={styles.time} />
+        <DateTime style={styles.time} time={info.lastEdit}/>
       </Pressable>
     </View>
   );

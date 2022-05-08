@@ -2,6 +2,8 @@ import { View, Text, StyleSheet } from "react-native";
 import Constants from "expo-constants";
 import { connect } from "react-redux";
 import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
+import moment from "moment";
+import "moment/locale/vi";
 
 import SearchBar from "../components/SearchBar";
 import NoteListItem from "../components/NoteListItem";
@@ -9,7 +11,8 @@ import BackButton from "../components/BackButton";
 import RestoreButton from "../components/RestoreButton";
 
 import { restoreFolder } from "../redux/reducers/Folder";
-import { restoreNote } from "../redux/reducers/Note";
+import { restoreNote, expulsionNote } from "../redux/reducers/Note";
+
 
 const mapStateToProps = (state) => ({
   noteList: state.note.noteList,
@@ -19,6 +22,7 @@ const mapStateToProps = (state) => ({
 const mapActionToProps = {
   restoreFolder,
   restoreNote,
+  expulsionNote,
 };
 
 function RecycleBin({
@@ -41,8 +45,18 @@ function RecycleBin({
     restoreNote(note);
   };
 
+  const handleExpulsionNote = (id) => {
+    expulsionNote(id);
+  };
+
   const renderItem = (data, rowMap) => {
-    if (data.item.isDeleted) {
+    if (
+      data.item.isDeleted &&
+      moment(data.item.lastEdit, "YYYYMMDDHHmmss").fromNow() ===
+        "một tháng trước"
+    ) {
+      handleExpulsionNote(data.item.id);
+    } else if (data.item.isDeleted) {
       return (
         <SwipeRow
           rightOpenValue={-80}
@@ -71,7 +85,7 @@ function RecycleBin({
       <BackButton style={styles.backButton} onBackPress={handleBackPress} />
       <Text style={styles.header}>Thùng rác</Text>
       <Text style={styles.note}>
-        Các ghi chú được giữ trong thùng rác trong 30 ngày trước khi bị xóa vĩnh
+        Các ghi chú được giữ trong thùng rác trong vòng 1 tháng trước khi bị xóa vĩnh
         viễn
       </Text>
       <SearchBar style={styles.searchBar} />

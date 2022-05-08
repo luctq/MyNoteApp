@@ -42,7 +42,7 @@ function Folder({ navigation, noteList, route, deleteNote }) {
         >
           <DeleteButton
             style={styles.deleteButton}
-            onDeletePress={() => deleteNote(data.item.id)}
+            onDeletePress={() => deleteNote(data.item)}
           />
           <NoteListItem
             style={styles.noteListItem}

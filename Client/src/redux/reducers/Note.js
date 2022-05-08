@@ -1,6 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { incNoteCountById, decNoteCountById } from "./Folder";
 import { dark, light, pink, yellow } from "../../themes/themes";
+import moment from "moment";
+import "moment/locale/vi";
+
+moment.locale("vi");
 const initialState = {
   noteList: [],
   theme: light,
@@ -20,9 +24,8 @@ const note = createSlice({
         folderId: action.payload.folderId,
         title: action.payload.title,
         content: action.payload.content,
-        lastEdit: null,
+        lastEdit: moment().format("YYYYMMDDHHmmss"),
         isDeleted: false,
-        deleteTime: null,
       };
       state.noteList.push(newNote);
     },
@@ -30,6 +33,7 @@ const note = createSlice({
       state.noteList = state.noteList.filter((note, index) => {
         if (note.id === action.payload) {
           note.isDeleted = true;
+          note.lastEdit = moment().format("YYYYMMDDHHmmss");
         }
         return note;
       });
@@ -38,6 +42,7 @@ const note = createSlice({
       state.noteList = state.noteList.filter((note, index) => {
         if (note.id === action.payload) {
           note.isDeleted = false;
+          note.lastEdit = moment().format("YYYYMMDDHHmmss");
         }
         return note;
       });
@@ -46,6 +51,7 @@ const note = createSlice({
       state.noteList = state.noteList.filter((note, index) => {
         if (note.folderId === action.payload) {
           note.isDeleted = true;
+          note.lastEdit = moment().format("YYYYMMDDHHmmss");
         }
         return note;
       });
@@ -55,8 +61,7 @@ const note = createSlice({
         if (note.id === action.payload.id) {
           note.title = action.payload.title;
           note.content = action.payload.content;
-          // cập nhật lastEdit
-          // note.lastEdit = Date.now();
+          note.lastEdit = moment().format("YYYYMMDDHHmmss");
         }
         return note;
       });
@@ -67,7 +72,7 @@ const note = createSlice({
       );
     },
     changeThemeScreen(state, action) {
-      state.theme = action.payload
+      state.theme = action.payload;
     },
   },
 });
@@ -79,29 +84,29 @@ export const {
   editNote,
   deleteNoteInFolderById,
   expulsionNoteById,
-  changeThemeScreen
+  changeThemeScreen,
 } = note.actions;
 
 export const changeTheme = (theme) => (dispatch) => {
   if (theme == "light") {
-    dispatch(changeThemeScreen(light))
+    dispatch(changeThemeScreen(light));
   } else if (theme == "dark") {
-    dispatch(changeThemeScreen(dark))
+    dispatch(changeThemeScreen(dark));
   } else if (theme == "yellow") {
-    dispatch(changeThemeScreen(yellow))
+    dispatch(changeThemeScreen(yellow));
   } else if (theme == "pink") {
-    dispatch(changeThemeScreen(pink))
+    dispatch(changeThemeScreen(pink));
   }
-}
+};
 
 export const createNewNote = (info) => (dispatch) => {
   dispatch(addNote(info));
   dispatch(incNoteCountById(info.folderId));
 };
 
-export const deleteNote = (id) => (dispatch) => {
-  dispatch(deleteNoteById(id));
-  dispatch(decNoteCountById(id));
+export const deleteNote = (note) => (dispatch) => {
+  dispatch(deleteNoteById(note.id));
+  dispatch(decNoteCountById(note.folderId));
 };
 
 export const restoreNote = (note) => (dispatch) => {

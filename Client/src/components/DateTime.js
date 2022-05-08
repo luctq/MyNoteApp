@@ -5,8 +5,10 @@ import "moment/locale/vi";
 
 moment.locale("vi");
 
-export default function DateTime() {
-  return <Text style={styles.time}>{moment("20220423", "YYYYMMDD").fromNow()}</Text>;
+export default function DateTime({time}) {
+  return (
+    <Text style={styles.time}>{moment(time, "YYYYMMDDHHmmss").fromNow()}</Text>
+  );
 }
 
 const styles = StyleSheet.create({
