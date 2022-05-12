@@ -324,7 +324,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, the
               <Ionicons name='close' size={25} color={tintColor} />
             )
           }}
-          style={[styles.richToolBar(theme), { bottom: -44 }]}
+          style={[styles.richToolBar(theme), { bottom: Platform.OS === 'ios' ? -44 : 0 }]}
           onPressAddImage={handlePressAddImage}
           insertVoice={recording ? handleStopRecording : handleInsertVoice}
           launchCamera={handleLaunchCamera}
