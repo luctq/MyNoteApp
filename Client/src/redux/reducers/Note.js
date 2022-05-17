@@ -7,7 +7,7 @@ import "moment/locale/vi";
 moment.locale("vi");
 const initialState = {
   noteList: [],
-  theme: light,
+  // theme: light,
 };
 
 const note = createSlice({
@@ -26,6 +26,7 @@ const note = createSlice({
         content: action.payload.content,
         lastEdit: moment().format("YYYYMMDDHHmmss"),
         isDeleted: false,
+        theme: light
       };
       state.noteList.push(newNote);
     },
@@ -72,7 +73,12 @@ const note = createSlice({
       );
     },
     changeThemeScreen(state, action) {
-      state.theme = action.payload;
+      state.noteList = state.noteList.filter((note, index) => {
+        if (note.id === action.payload.id) {
+          note.theme = action.payload.theme;
+        }
+        return note;
+      });
     },
   },
 });
@@ -87,15 +93,15 @@ export const {
   changeThemeScreen,
 } = note.actions;
 
-export const changeTheme = (theme) => (dispatch) => {
+export const changeTheme = (id, theme) => (dispatch) => {
   if (theme == "light") {
-    dispatch(changeThemeScreen(light));
+    dispatch(changeThemeScreen({id: id, theme: light}));
   } else if (theme == "dark") {
-    dispatch(changeThemeScreen(dark));
+    dispatch(changeThemeScreen({id: id, theme: dark}));
   } else if (theme == "yellow") {
-    dispatch(changeThemeScreen(yellow));
+    dispatch(changeThemeScreen({id: id, theme: yellow}));
   } else if (theme == "pink") {
-    dispatch(changeThemeScreen(pink));
+    dispatch(changeThemeScreen({id: id, theme: pink}));
   }
 };
 

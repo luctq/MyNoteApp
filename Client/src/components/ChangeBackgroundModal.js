@@ -35,7 +35,7 @@ function ChangeBackgroundModal(props) {
       <Pressable
           style={{ height: 120, width: 90, backgroundColor: '#ededed', borderRadius: 20}}
           onPress={() => {
-            props.changeTheme("light");
+            props.changeTheme(props.noteId, "light");
             props.onClosed();
           }}
         >
@@ -43,7 +43,7 @@ function ChangeBackgroundModal(props) {
       <Pressable
           style={{ height: 120, width: 90, backgroundColor: '#2E3440', borderRadius: 20}}
           onPress={() => {
-            props.changeTheme("dark");
+            props.changeTheme(props.noteId, "dark");
             props.onClosed();
           }}
         >
@@ -51,7 +51,7 @@ function ChangeBackgroundModal(props) {
       <Pressable
           style={{ height: 120, width: 90, backgroundColor: '#ffd966', borderRadius: 20}}
           onPress={() => {
-            props.changeTheme("yellow");
+            props.changeTheme(props.noteId, "yellow");
             props.onClosed();
           }}
         >
@@ -59,7 +59,7 @@ function ChangeBackgroundModal(props) {
       <Pressable
           style={{ height: 120, width: 90, backgroundColor: '#ff6379', borderRadius: 20}}
           onPress={() => {
-            props.changeTheme("pink");
+            props.changeTheme(props.noteId, "pink");
             props.onClosed();
           }}
         >
