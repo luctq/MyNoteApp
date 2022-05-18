@@ -1,71 +1,174 @@
-import { View, Text, StyleSheet } from 'react-native'
-import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view'
+import { useState } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
+import Constants from "expo-constants";
+import { connect } from "react-redux";
 
-import SearchBar from '../components/SearchBar'
-import TodoListItem from '../components/TodoListItem'
-import DeleteButton from '../components/DeleteButton'
+import SettingButton from "../components/SettingButton";
+import SearchBar from "../components/SearchBar";
+import CheckButton from "../components/CheckButton";
+import FolderListItem from "../components/FolderListItem";
+import DeleteButton from "../components/DeleteButton";
+import DropDownOfFolder from "../components/DropDownOfFolder";
+import { AntIcons} from "react-native-vector-icons/AntDesign";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { deleteFolder } from "../redux/reducers/Folder";
+import { deleteNoteInFolder } from "../redux/reducers/Note";
 
-function TodoList () {
+const mapStateToProps = (state) => ({
+  folderList: state.folder.folderList,
+  folderCount: state.folder.folderCount,
+});
 
-  const renderItem = (data, rowMap) => (
-    <SwipeRow
-      rightOpenValue={-80}
-      leftOpenValue={0}
-      disableRightSwipe={true}
-    >
-      <DeleteButton style={styles.deleteButton} />
-      <TodoListItem style={styles.todoListItem}/>
-    </SwipeRow>
-  )
+const mapActionToProps = {
+  deleteFolder,
+  deleteNoteInFolder,
+};
 
-  const keyExtractor = (item) => item.id
+function TodoList({
+  navigation,
+  folderList,
+  folderCount,
+  deleteFolder,
+  deleteNoteInFolder,
+}) {
+  const [isOpenDropDown, setIsOpenDropDown] = useState(false);
+  const [textSearch, setTextSearch] = useState("");
+
+  const handlePressFolderIcon = () => {
+    navigation.navigate("Home");
+  };
+  const handleSettingPress = () => {
+    navigation.navigate("Settings");
+  };
+  const handleRecycleBinPress = () => {
+    navigation.navigate("RecycleBin");
+  };
+  const handleFolderListItemPress = (id, name) => {
+    navigation.navigate("Folder", { name, id });
+  };
+  const handleDeleteFolder = (id) => {
+    deleteNoteInFolder(id);
+    deleteFolder(id);
+  };
+  const renderItem = (data, rowMap) => {
+    if (
+      !data.item.isDeleted &&
+      data.item.name.toLowerCase().includes(textSearch.toLowerCase())
+    ) {
+      return (
+        <SwipeRow
+          rightOpenValue={-80}
+          leftOpenValue={0}
+          disableRightSwipe={true}
+          style={styles.folderRow}
+        >
+          <DeleteButton
+            style={styles.deleteButton}
+            onDeletePress={() => handleDeleteFolder(data.item.id)}
+          />
+          <FolderListItem
+            style={styles.folderListItem}
+            onFolderListItemPress={() =>
+              handleFolderListItemPress(data.item.id, data.item.name)
+            }
+            info={data.item}
+          />
+        </SwipeRow>
+      );
+    } else return <></>;
+  };
+  const keyExtractor = (item) => item.id;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Thư mục</Text>
-      <SearchBar style={styles.searchBar} />
-      <SwipeListView 
-        data={[{id: 0, noteTitle: 'Tiêu đề 1', noteContent: 'Nội dung...'}, {id: 1, noteTitle: 'Tiêu đề 2', noteContent: 'Nội dung...'}]}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
+      <DropDownOfFolder
+        isOpen={isOpenDropDown}
+        setIsOpen={() => handlePressFolderIcon()}
+        onRecycleBinPress={handleRecycleBinPress}
       />
+      <SettingButton
+        style={styles.settingButton}
+        onSettingPress={handleSettingPress}
+      />
+      <View style={styles.headerIcon}>
+        <View style={styles.folderButton}>
+          <TouchableOpacity onPress={() => handlePressFolderIcon()}>
+            <MaterialIcons name="folder-open" size={30} color="#000" />
+          </TouchableOpacity>
+        </View>
+        <CheckButton name="checksquare" style={styles.checkButton} onCheckButtonPress={() => handleCheckButtonPress()}/>
+      </View>
+      <SearchBar style={styles.searchBar} textSearch={textSearch} setTextSearch={setTextSearch} />
+      {folderCount === 0 ? (
+        <View>
+          <Image
+            source={require("../public/emptyNote.png")}
+            style={styles.emptyNoteImage}
+          />
+          <Text style={{ textAlign: "center" }}>
+            Không có ghi chú nào ở đây
+          </Text>
+        </View>
+      ) : (
+        <SwipeListView
+          data={folderList}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+        />
+      )}
     </View>
-  )
+  );
 }
+
+// height: 667
+// width: 375
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f7f7f7',
+    position: "relative",
+    backgroundColor: "#f7f7f7",
     flex: 1,
-    paddingHorizontal: 25
+    paddingHorizontal: 25,
   },
-  header: {
-    fontSize: 35,
-    fontWeight: '400', 
-    marginTop: 40
+  settingButton: {
+    position: "absolute",
+    top: Constants.statusBarHeight + 5,
+    right: 15,
+    zIndex: 1,
   },
-  note: {
-    fontSize: 15,
-    fontWeight: '300',
-    color: '#FF9900',
-    backgroundColor: '#FFF9EF',
-    borderRadius: 27,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    overflow: 'hidden',
-    marginTop: 10
+  headerIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: Constants.statusBarHeight + 10,
   },
   searchBar: {
-    marginTop: 20
+    marginTop: 40,
+  },
+  folderButton: {
+    paddingHorizontal: 8,
+  },
+  checkButton: {
+    paddingHorizontal: 8,
+    color: 'yellow'
+  },
+  emptyNoteImage: {
+    width: 211,
+    height: 173,
+    marginTop: 100,
+    marginLeft: 80,
   },
   deleteButton: {
-    alignItems: 'flex-end',
-    marginTop: 23,
-    justifyContent: 'center'
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
-  todoListItem: {
-    marginTop: 20
-  }
-})
+  folderListItem: {},
+  folderRow: {
+    marginTop: 20,
+  },
+});
 
-export default TodoList
+export default connect(mapStateToProps, mapActionToProps)(TodoList);
