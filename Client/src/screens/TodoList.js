@@ -1,40 +1,34 @@
 import { useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
 import Constants from "expo-constants";
 import { connect } from "react-redux";
-
 import SettingButton from "../components/SettingButton";
 import SearchBar from "../components/SearchBar";
 import CheckButton from "../components/CheckButton";
-import FolderListItem from "../components/FolderListItem";
 import DeleteButton from "../components/DeleteButton";
-import DropDownOfFolder from "../components/DropDownOfFolder";
-import { AntIcons} from "react-native-vector-icons/AntDesign";
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { deleteFolder } from "../redux/reducers/Folder";
-import { deleteNoteInFolder } from "../redux/reducers/Note";
-
+import { AntIcons } from "react-native-vector-icons/AntDesign";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import TodoListItem from "../components/TodoListItem";
+import AddTodoButton from "../components/AddTodoButton";
 const mapStateToProps = (state) => ({
-  folderList: state.folder.folderList,
-  folderCount: state.folder.folderCount,
+  todoList: state.todo.todoList,
+  todoListCompleted: state.todo.todoListCompleted,
+  todoCount: state.todo.todoCount,
 });
 
-const mapActionToProps = {
-  deleteFolder,
-  deleteNoteInFolder,
-};
+const mapActionToProps = {};
 
-function TodoList({
-  navigation,
-  folderList,
-  folderCount,
-  deleteFolder,
-  deleteNoteInFolder,
-}) {
-  const [isOpenDropDown, setIsOpenDropDown] = useState(false);
+function TodoList({ navigation, todoList, todoCount, todoListCompleted }) {
   const [textSearch, setTextSearch] = useState("");
-
+  const [isSelected, setSelection] = useState(false);
   const handlePressFolderIcon = () => {
     navigation.navigate("Home");
   };
@@ -44,17 +38,40 @@ function TodoList({
   const handleRecycleBinPress = () => {
     navigation.navigate("RecycleBin");
   };
-  const handleFolderListItemPress = (id, name) => {
-    navigation.navigate("Folder", { name, id });
-  };
-  const handleDeleteFolder = (id) => {
-    deleteNoteInFolder(id);
-    deleteFolder(id);
-  };
-  const renderItem = (data, rowMap) => {
+  const handleTodoListItemPress = (id, ti) => {};
+  const handleDeleteFolder = (id) => {};
+  const renderItemTodoList = (data, rowMap) => {
     if (
       !data.item.isDeleted &&
-      data.item.name.toLowerCase().includes(textSearch.toLowerCase())
+      data.item.content.toLowerCase().includes(textSearch.toLowerCase())
+    ) {
+      return (
+        <SwipeRow
+          rightOpenValue={-80}
+          leftOpenValue={0}
+          disableRightSwipe={true}
+          style={styles.todoRow}
+        >
+          <DeleteButton
+            style={styles.deleteButton}
+            onDeletePress={() => handleDeleteFolder(data.item.id)}
+          />
+          <TodoListItem
+            type="todoList"
+            style={styles.todoListItem}
+            onTodoListItemPress={() =>
+              handleTodoListItemPress(data.item.id, data.item.content)
+            }
+            info={data.item}
+          />
+        </SwipeRow>
+      );
+    } else return <></>;
+  };
+  const renderItemTodoListCompleted = (data, rowMap) => {
+    if (
+      !data.item.isDeleted &&
+      data.item.content.toLowerCase().includes(textSearch.toLowerCase())
     ) {
       return (
         <SwipeRow
@@ -67,10 +84,11 @@ function TodoList({
             style={styles.deleteButton}
             onDeletePress={() => handleDeleteFolder(data.item.id)}
           />
-          <FolderListItem
-            style={styles.folderListItem}
-            onFolderListItemPress={() =>
-              handleFolderListItemPress(data.item.id, data.item.name)
+          <TodoListItem
+            type="todoListComplete"
+            style={styles.todoListItem}
+            onTodoListItemPress={() =>
+              handleTodoListItemPress(data.item.id, data.item.content)
             }
             info={data.item}
           />
@@ -82,25 +100,24 @@ function TodoList({
 
   return (
     <View style={styles.container}>
-      <DropDownOfFolder
-        isOpen={isOpenDropDown}
-        setIsOpen={() => handlePressFolderIcon()}
-        onRecycleBinPress={handleRecycleBinPress}
-      />
       <SettingButton
         style={styles.settingButton}
         onSettingPress={handleSettingPress}
       />
       <View style={styles.headerIcon}>
-        <View style={styles.folderButton}>
+        <View style={styles.todoButton}>
           <TouchableOpacity onPress={() => handlePressFolderIcon()}>
             <MaterialIcons name="folder-open" size={30} color="#000" />
           </TouchableOpacity>
         </View>
-        <CheckButton name="checksquare" style={styles.checkButton} onCheckButtonPress={() => handleCheckButtonPress()}/>
+        <CheckButton name="checksquare" style={styles.checkButton} />
       </View>
-      <SearchBar style={styles.searchBar} textSearch={textSearch} setTextSearch={setTextSearch} />
-      {folderCount === 0 ? (
+      <SearchBar
+        style={styles.searchBar}
+        textSearch={textSearch}
+        setTextSearch={setTextSearch}
+      />
+      {todoCount === 0 ? (
         <View>
           <Image
             source={require("../public/emptyNote.png")}
@@ -111,12 +128,31 @@ function TodoList({
           </Text>
         </View>
       ) : (
-        <SwipeListView
-          data={folderList}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-        />
+        <View>
+          <SwipeListView
+            data={todoList}
+            renderItem={renderItemTodoList}
+            keyExtractor={keyExtractor}
+          />
+          {todoListCompleted.length === 0 ? null : (
+            <View>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10}}>
+                <MaterialIcons name='arrow-drop-down' size={25} color="#000" />
+                <Text>Hoàn tất {todoListCompleted.length}</Text>
+              </TouchableOpacity>
+              <SwipeListView
+                data={todoListCompleted}
+                renderItem={renderItemTodoListCompleted}
+                keyExtractor={keyExtractor}
+              />
+            </View>
+          )}
+        </View>
       )}
+       <AddTodoButton
+        style={styles.addTodoButton}
+        onAddNewNotePress={() => alert('add todo')}
+      />
     </View>
   );
 }
@@ -146,12 +182,12 @@ const styles = StyleSheet.create({
   searchBar: {
     marginTop: 40,
   },
-  folderButton: {
-    paddingHorizontal: 8,
+  todoButton: {
+    paddingHorizontal: 25,
   },
   checkButton: {
     paddingHorizontal: 8,
-    color: 'yellow'
+    color: "yellow",
   },
   emptyNoteImage: {
     width: 211,
@@ -165,10 +201,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  folderListItem: {},
-  folderRow: {
+  todoListItem: {},
+  todoRow: {
     marginTop: 20,
   },
+  addTodoButton: {
+    position: "absolute",
+    bottom: 58,
+    right: 25,
+  }
 });
 
 export default connect(mapStateToProps, mapActionToProps)(TodoList);

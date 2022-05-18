@@ -59,7 +59,7 @@ function Router () {
           component={Settings}
           options={{
             headerShown: false,
-            animation: 'simple_push'
+            animation: 'slide_from_right'
           }}
         />
         <Stack.Screen 
