@@ -25,7 +25,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { connect } from "react-redux";
 import FlashMessage, { showMessage } from 'react-native-flash-message'
-
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
 import ThreeDotButton from '../components/ThreeDotButton'
@@ -40,7 +39,7 @@ import {
   deleteNote
 } from "../redux/reducers/Note";
 import ChangeBackgroundModal from '../components/ChangeBackgroundModal'
-import { light } from '../themes/themes'
+import { light, dark, yellow, pink } from '../themes/themes'
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -58,8 +57,9 @@ const mapActionToProps = {
 };
 
 function Note({ navigation, route, createNewNote, updateNote, expulsionNote, deleteNote, noteList }) {
+  const listTheme = {"light": light, "yellow": yellow, "dark": dark, "pink": pink}
   const note = route.params.item;
-  const theme = noteList[note.id].theme;
+  const theme = listTheme[noteList[note.id].theme];
   const isNew = route.params.isNew;
   const folderName = route.params.folderName;
   const [isOpen, setIsOpen] = useState(false);

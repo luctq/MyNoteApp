@@ -10,7 +10,6 @@ import AddNewNoteButton from "../components/AddNewNoteButton";
 import DeleteButton from "../components/DeleteButton";
 import BackButton from "../components/BackButton";
 import { deleteNote, createNewNote } from "../redux/reducers/Note";
-import { light } from "../themes/themes";
 
 const mapStateToProps = (state) => ({
   noteList: state.note.noteList,
@@ -71,7 +70,7 @@ function Folder({ navigation, noteList, route, deleteNote, createNewNote }) {
         lastEdit: null,
         isDeleted: false,
         deleteTime: null,
-        theme: light
+        theme: "light"
     }
     await createNewNote(newNote)
     navigation.navigate("Note", {
