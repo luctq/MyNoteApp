@@ -5,6 +5,7 @@ import CheckBox from "react-native-check-box";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { textDecorationColor } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
 import { handleCheck, handleUnCheck } from "../redux/reducers/Todo";
+import NewTodoModal from "./NewTodoModal";
 const mapActionToProps = {
   handleCheck,
   handleUnCheck
@@ -47,7 +48,7 @@ function TodoListItem({
             onClick={() => handleCheckBox()}
             isChecked={isSelected}
           />
-          <View style={{ marginTop: 4 }}>
+          <View style={{marginTop: 4}}>
             {type === "todoList" ? (
               <Text style={styles.title}>
                 {shrinkTextLonger35Char(info.content)}

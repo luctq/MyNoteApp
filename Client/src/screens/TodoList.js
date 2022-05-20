@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,9 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  LogBox,
 } from "react-native";
+import { ScrollView } from "react-native-virtualized-view";
 import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
 import Constants from "expo-constants";
 import { connect } from "react-redux";
@@ -18,17 +20,31 @@ import { AntIcons } from "react-native-vector-icons/AntDesign";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TodoListItem from "../components/TodoListItem";
 import AddTodoButton from "../components/AddTodoButton";
+import NewTodoModal from "../components/NewTodoModal";
+import { deleteTodo } from "../redux/reducers/Todo";
+import moment from "moment";
 const mapStateToProps = (state) => ({
   todoList: state.todo.todoList,
   todoListCompleted: state.todo.todoListCompleted,
   todoCount: state.todo.todoCount,
 });
 
-const mapActionToProps = {};
-
-function TodoList({ navigation, todoList, todoCount, todoListCompleted }) {
+const mapActionToProps = {
+  deleteTodo,
+};
+function TodoList({
+  navigation,
+  todoList,
+  todoCount,
+  todoListCompleted,
+  deleteTodo,
+}) {
+  const [isOpenNewTodoModal, setIsOpenNewTodoModal] = useState(false);
+  const [typeModal, setTypeModal] = useState({
+    type: "newTodoModal",
+    todo: { id: "", content: "" },
+  });
   const [textSearch, setTextSearch] = useState("");
-  const [isSelected, setSelection] = useState(false);
   const handlePressFolderIcon = () => {
     navigation.navigate("Home");
   };
@@ -38,8 +54,20 @@ function TodoList({ navigation, todoList, todoCount, todoListCompleted }) {
   const handleRecycleBinPress = () => {
     navigation.navigate("RecycleBin");
   };
-  const handleTodoListItemPress = (id, ti) => {};
-  const handleDeleteFolder = (id) => {};
+  const handleTodoListItemPress = (type, item) => {
+    setTypeModal({
+      type: "editTodoModal" + type,
+      todo: { id: item.id, content: item.content },
+    });
+    setIsOpenNewTodoModal(!isOpenNewTodoModal);
+  };
+  const handleDeleteFolder = (type, id) => {
+    var isSelected = false;
+    if (type === "todoListComplete") {
+      isSelected = true;
+    }
+    deleteTodo(isSelected, id);
+  };
   const renderItemTodoList = (data, rowMap) => {
     if (
       !data.item.isDeleted &&
@@ -47,6 +75,7 @@ function TodoList({ navigation, todoList, todoCount, todoListCompleted }) {
     ) {
       return (
         <SwipeRow
+          scrollEnabled={false}
           rightOpenValue={-80}
           leftOpenValue={0}
           disableRightSwipe={true}
@@ -54,14 +83,12 @@ function TodoList({ navigation, todoList, todoCount, todoListCompleted }) {
         >
           <DeleteButton
             style={styles.deleteButton}
-            onDeletePress={() => handleDeleteFolder(data.item.id)}
+            onDeletePress={() => handleDeleteFolder("todoList", data.item.id)}
           />
           <TodoListItem
             type="todoList"
             style={styles.todoListItem}
-            onTodoListItemPress={() =>
-              handleTodoListItemPress(data.item.id, data.item.content)
-            }
+            onTodoListItemPress={() => handleTodoListItemPress("", data.item)}
             info={data.item}
           />
         </SwipeRow>
@@ -75,6 +102,7 @@ function TodoList({ navigation, todoList, todoCount, todoListCompleted }) {
     ) {
       return (
         <SwipeRow
+          scrollEnabled={false}
           rightOpenValue={-80}
           leftOpenValue={0}
           disableRightSwipe={true}
@@ -82,13 +110,15 @@ function TodoList({ navigation, todoList, todoCount, todoListCompleted }) {
         >
           <DeleteButton
             style={styles.deleteButton}
-            onDeletePress={() => handleDeleteFolder(data.item.id)}
+            onDeletePress={() =>
+              handleDeleteFolder("todoListComplete", data.item.id)
+            }
           />
           <TodoListItem
             type="todoListComplete"
-            style={styles.todoListItem}
+            style={styles.todoListItemComplete}
             onTodoListItemPress={() =>
-              handleTodoListItemPress(data.item.id, data.item.content)
+              handleTodoListItemPress("IsSelected", data.item)
             }
             info={data.item}
           />
@@ -96,64 +126,96 @@ function TodoList({ navigation, todoList, todoCount, todoListCompleted }) {
       );
     } else return <></>;
   };
-  const keyExtractor = (item) => item.id;
-
+  const keyExtractor = (intem, index) => `_key${index.toString()}`;
+  useEffect(() => {
+    LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+  }, []);
   return (
-    <View style={styles.container}>
-      <SettingButton
-        style={styles.settingButton}
-        onSettingPress={handleSettingPress}
+    <>
+      <NewTodoModal
+        type={typeModal}
+        isOpen={isOpenNewTodoModal}
+        onClosed={() => setIsOpenNewTodoModal(false)}
       />
-      <View style={styles.headerIcon}>
-        <View style={styles.todoButton}>
-          <TouchableOpacity onPress={() => handlePressFolderIcon()}>
-            <MaterialIcons name="folder-open" size={30} color="#000" />
-          </TouchableOpacity>
-        </View>
-        <CheckButton name="checksquare" style={styles.checkButton} />
-      </View>
-      <SearchBar
-        style={styles.searchBar}
-        textSearch={textSearch}
-        setTextSearch={setTextSearch}
-      />
-      {todoCount === 0 ? (
-        <View>
-          <Image
-            source={require("../public/emptyNote.png")}
-            style={styles.emptyNoteImage}
+      <ScrollView nestedScrollEnabled={true} style={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          <SettingButton
+            style={styles.settingButton}
+            onSettingPress={handleSettingPress}
           />
-          <Text style={{ textAlign: "center" }}>
-            Không có ghi chú nào ở đây
-          </Text>
-        </View>
-      ) : (
-        <View>
-          <SwipeListView
-            data={todoList}
-            renderItem={renderItemTodoList}
-            keyExtractor={keyExtractor}
-          />
-          {todoListCompleted.length === 0 ? null : (
-            <View>
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10}}>
-                <MaterialIcons name='arrow-drop-down' size={25} color="#000" />
-                <Text>Hoàn tất {todoListCompleted.length}</Text>
+          <View style={styles.headerIcon}>
+            <View style={styles.todoButton}>
+              <TouchableOpacity onPress={() => handlePressFolderIcon()}>
+                <MaterialIcons name="folder-open" size={30} color="#000" />
               </TouchableOpacity>
+            </View>
+            <CheckButton name="checksquare" style={styles.checkButton} />
+          </View>
+          <SearchBar
+            style={styles.searchBar}
+            textSearch={textSearch}
+            setTextSearch={setTextSearch}
+          />
+
+          {todoCount === 0 ? (
+            <View>
+              <Image
+                source={require("../public/emptyNote.png")}
+                style={styles.emptyNoteImage}
+              />
+              <Text style={{ textAlign: "center" }}>
+                Không có ghi chú nào ở đây
+              </Text>
+            </View>
+          ) : (
+            <View>
               <SwipeListView
-                data={todoListCompleted}
-                renderItem={renderItemTodoListCompleted}
+                scrollEnabled={false}
+                data={todoList}
+                renderItem={renderItemTodoList}
+                listKey={moment().valueOf().toString()}
                 keyExtractor={keyExtractor}
               />
+              {todoListCompleted.length === 0 ? null : (
+                <View>
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginVertical: 10,
+                    }}
+                  >
+                    <MaterialIcons
+                      name="arrow-drop-down"
+                      size={25}
+                      color="#000"
+                    />
+                    <Text>Hoàn tất {todoListCompleted.length}</Text>
+                  </TouchableOpacity>
+                  <SwipeListView
+                    scrollEnabled={false}
+                    data={todoListCompleted}
+                    renderItem={renderItemTodoListCompleted}
+                    listKey={moment().valueOf().toString()}
+                    keyExtractor={keyExtractor}
+                  />
+                </View>
+              )}
             </View>
           )}
         </View>
-      )}
-       <AddTodoButton
+      </ScrollView>
+      <AddTodoButton
         style={styles.addTodoButton}
-        onAddNewNotePress={() => alert('add todo')}
+        onAddTodoPress={() => {
+          setTypeModal({
+            type: "newTodoModal",
+            todo: { id: "", content: "" },
+          });
+          setIsOpenNewTodoModal(!isOpenNewTodoModal);
+        }}
       />
-    </View>
+    </>
   );
 }
 
@@ -209,7 +271,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 58,
     right: 25,
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapActionToProps)(TodoList);
