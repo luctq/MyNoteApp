@@ -26,7 +26,7 @@ const note = createSlice({
         content: action.payload.content,
         lastEdit: moment().format("YYYYMMDDHHmmss"),
         isDeleted: false,
-        theme: light
+        theme: "light"
       };
       state.noteList.push(newNote);
     },
@@ -98,15 +98,7 @@ export const {
 } = note.actions;
 
 export const changeTheme = (id, theme) => (dispatch) => {
-  if (theme == "light") {
-    dispatch(changeThemeScreen({id: id, theme: light}));
-  } else if (theme == "dark") {
-    dispatch(changeThemeScreen({id: id, theme: dark}));
-  } else if (theme == "yellow") {
-    dispatch(changeThemeScreen({id: id, theme: yellow}));
-  } else if (theme == "pink") {
-    dispatch(changeThemeScreen({id: id, theme: pink}));
-  }
+  dispatch(changeThemeScreen({id: id, theme: theme}));
 };
 
 export const createNewNote = (info) => (dispatch) => {
