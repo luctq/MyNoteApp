@@ -1,44 +1,117 @@
-import React from "react"
-import { View, Text, StyleSheet } from "react-native"
-import CheckBox from '@react-native-community/checkbox'
+import { useState } from "react";
+import { connect } from "react-redux";
+import { StyleSheet, Text, View, Pressable } from "react-native";
+import CheckBox from "react-native-check-box";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { textDecorationColor } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
+import { handleCheck, handleUnCheck } from "../redux/reducers/Todo";
+import NewTodoModal from "./NewTodoModal";
+const mapActionToProps = {
+  handleCheck,
+  handleUnCheck
+};
+const mapStateToProps = (state) => ({
+});
 
-function TodoListItem({ style }) {
+function TodoListItem({
+  style,
+  onTodoListItemPress,
+  info,
+  type,
+  handleCheck,
+  handleUnCheck
+}) {
+  const shrinkTextLonger35Char = (text) => {
+    if (text.length < 35) {
+      return text;
+    } else {
+      return text.substring(0, 35) + "...";
+    }
+  };
 
-  const [isSelected, setSelection] = React.useState(false);
-
+  const handleCheckBox = () => {
+    if (isSelected) {
+      handleUnCheck(info.id)
+    } else {
+      handleCheck(info.id)
+    }
+    setSelection(!isSelected);
+  }
+  const [isSelected, setSelection] = useState(type === "todoListComplete");
   return (
     <View style={style}>
-      <View style={styles.container}>
-        {/* <CheckBox
-          disabled={false}
-          value={isSelected}
-          onValueChange={setSelection}
-          style={styles.checkbox}
-        /> */}
-        <Text style={styles.text}>Todo List Item</Text>
-      </View>
+      <Pressable style={styles.container} onPress={onTodoListItemPress}>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            style={[styles.checkbox]}
+            checkBoxColor={isSelected ? "gray" : "black"}
+            onClick={() => handleCheckBox()}
+            isChecked={isSelected}
+          />
+          <View style={{marginTop: 4}}>
+            {type === "todoList" ? (
+              <Text style={styles.title}>
+                {shrinkTextLonger35Char(info.content)}
+              </Text>
+            ) : (
+              <Text
+                style={[
+                  styles.title,
+                  {
+                    textDecorationLine: "line-through",
+                    textDecorationStyle: "solid",
+                    color: "gray",
+                  },
+                ]}
+              >
+                {shrinkTextLonger35Char(info.content)}
+              </Text>
+            )}
+          </View>
+        </View>
+      </Pressable>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    paddingVertical: 30,
-    paddingHorizontal: 10,
-    backgroundColor: "#fff",
-    // marginHorizontal: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
+    // width: "80%",
+    height: 80,
+    paddingLeft: 10,
+    paddingRight: 10,
+    // marginTop: 20,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    borderRadius: 14,
-    // marginBottom: 6
+    justifyContent: "center",
   },
   checkbox: {
-    marginRight: 8
+    alignSelf: "center",
   },
-  text: {
+  icon: {
+    margin: 10,
+    marginTop: 20,
+    flex: 1,
+  },
+  title: {
     fontWeight: "bold",
-    fontSize: 16
-  }
-})
+    fontSize: 17,
+    marginLeft: 5,
+    marginTop: 24,
+    flex: 8,
+  },
+  count: {
+    fontSize: 20,
+    color: "#B9B9B9",
+    marginTop: 28,
+    flex: 1,
+    marginLeft: 10,
+  },
+});
 
-export default TodoListItem
+export default connect(mapStateToProps, mapActionToProps)(TodoListItem);

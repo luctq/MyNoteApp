@@ -22,7 +22,8 @@ function Router () {
           name='Home'
           component={Home}
           options={{
-            headerShown: false
+            headerShown: false,
+            animation: 'slide_from_left'
           }}
         />
         <Stack.Screen 
@@ -57,7 +58,8 @@ function Router () {
           name='Settings'
           component={Settings}
           options={{
-            headerShown: false
+            headerShown: false,
+            animation: 'slide_from_right'
           }}
         />
         <Stack.Screen 
@@ -70,6 +72,10 @@ function Router () {
         <Stack.Screen 
           name='TodoList'
           component={TodoList}
+          options={{
+            headerShown: false,
+            animation: 'slide_from_right'
+          }}
         />
         <Stack.Screen 
           name='Draw'

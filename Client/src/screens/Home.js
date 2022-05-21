@@ -11,7 +11,7 @@ import FolderListItem from "../components/FolderListItem";
 import DeleteButton from "../components/DeleteButton";
 import DropDownOfFolder from "../components/DropDownOfFolder";
 import AntIcons from "react-native-vector-icons/AntDesign";
-
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { deleteFolder } from "../redux/reducers/Folder";
 import { deleteNoteInFolder } from "../redux/reducers/Note";
 
@@ -38,6 +38,9 @@ function Home({
   const handlePressFolderIcon = () => {
     setIsOpenDropDown(!isOpenDropDown);
   };
+  const handleCheckButtonPress = () => {
+    navigation.navigate("TodoList");
+  }
   const handleSettingPress = () => {
     navigation.navigate("Settings");
   };
@@ -94,10 +97,13 @@ function Home({
       <View style={styles.headerIcon}>
         <View style={styles.folderButton}>
           <TouchableOpacity onPress={() => handlePressFolderIcon()}>
-            <AntIcons name="folderopen" size={25} color="#000" />
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+            <MaterialIcons name="folder" size={30} color="#000" />
+            <MaterialIcons name="arrow-drop-down" size={20} color="#000" />
+            </View>
           </TouchableOpacity>
         </View>
-        <CheckButton style={styles.checkButton} />
+        <CheckButton name="checksquareo" style={styles.checkButton} onCheckButtonPress={() => handleCheckButtonPress()}/>
       </View>
       <SearchBar style={styles.searchBar} textSearch={textSearch} setTextSearch={setTextSearch} />
       {folderCount === 0 ? (

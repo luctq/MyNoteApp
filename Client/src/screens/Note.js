@@ -25,7 +25,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { connect } from "react-redux";
 import FlashMessage, { showMessage } from 'react-native-flash-message'
-
 import ShareButton from '../components/ShareButton'
 import ChangeBackgroundButton from '../components/ChangeBackgroundButton'
 import ThreeDotButton from '../components/ThreeDotButton'
@@ -37,8 +36,10 @@ import {
   createNewNote,
   updateNote,
   expulsionNote,
+  deleteNote
 } from "../redux/reducers/Note";
 import ChangeBackgroundModal from '../components/ChangeBackgroundModal'
+import { light, dark, yellow, pink } from '../themes/themes'
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -46,17 +47,19 @@ LogBox.ignoreLogs([
 
 const screen = Dimensions.get('window')
 const mapStateToProps = (state) => ({
-  theme: state.note.theme
+  noteList: state.note.noteList,
 });
 const mapActionToProps = {
   createNewNote,
   updateNote,
   expulsionNote,
+  deleteNote
 };
 
-function Note({ navigation, route, createNewNote, updateNote, expulsionNote, theme }) {
-
+function Note({ navigation, route, createNewNote, updateNote, expulsionNote, deleteNote, noteList }) {
+  const listTheme = {"light": light, "yellow": yellow, "dark": dark, "pink": pink}
   const note = route.params.item;
+  const theme = listTheme[noteList[note.id].theme];
   const isNew = route.params.isNew;
   const folderName = route.params.folderName;
   const [isOpen, setIsOpen] = useState(false);
@@ -119,9 +122,13 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, the
     if (!isNew) {
       if (noteContent === "" && noteTitle === "") expulsionNote(note.id);
       else updateNote({ ...note, title: noteTitle, content: noteContent });
-    } else if (noteTitle !== "" || noteContent !== "") {
-      createNewNote({ ...note, title: noteTitle, content: noteContent });
+    } else {
+      if (noteContent === "" && noteTitle === "") expulsionNote(note.id);
+      else if (noteTitle !== "" || noteContent !== "") {
+        updateNote({ ...note, title: noteTitle, content: noteContent });
+      }
     }
+    
     navigation.goBack();
   };
   const handlePressAddImage = useCallback(async () => {
@@ -251,7 +258,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, the
           <Text style={styles.folderName(theme)}>{folderName}</Text>
         </TouchableOpacity>
       </View>
-      <ChangeBackgroundModal isOpen={isOpenModalChangeBackground} onClosed={() => setIsOpenModalChangeBackground(false)}/>
+      <ChangeBackgroundModal noteId = {note.id} isOpen={isOpenModalChangeBackground} onClosed={() => setIsOpenModalChangeBackground(false)}/>
       <DropDownOfThreeDot
         isOpen={isOpenDropDown}
         setIsOpen={() => handlePressFolderIcon()}

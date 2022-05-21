@@ -9,7 +9,7 @@ import NoteListItem from "../components/NoteListItem";
 import AddNewNoteButton from "../components/AddNewNoteButton";
 import DeleteButton from "../components/DeleteButton";
 import BackButton from "../components/BackButton";
-import { deleteNote } from "../redux/reducers/Note";
+import { deleteNote, createNewNote } from "../redux/reducers/Note";
 
 const mapStateToProps = (state) => ({
   noteList: state.note.noteList,
@@ -17,9 +17,10 @@ const mapStateToProps = (state) => ({
 
 const mapActionToProps = {
   deleteNote,
+  createNewNote
 };
 
-function Folder({ navigation, noteList, route, deleteNote }) {
+function Folder({ navigation, noteList, route, deleteNote, createNewNote }) {
   const id = route.params.id;
   const name = route.params.name;
   const [textSearch, setTextSearch] = useState("");
@@ -60,9 +61,8 @@ function Folder({ navigation, noteList, route, deleteNote }) {
   const handleNoteListItemPress = (item) => {
     navigation.navigate("Note", { item, isNew: false, folderName: name, });
   };
-  const handleAddNewNotePress = () => {
-    navigation.navigate("Note", {
-      item: {
+  const handleAddNewNotePress = async () => {
+    const newNote = {
         id: noteList.length,
         folderId: id,
         title: "",
@@ -70,7 +70,11 @@ function Folder({ navigation, noteList, route, deleteNote }) {
         lastEdit: null,
         isDeleted: false,
         deleteTime: null,
-      },
+        theme: "light"
+    }
+    await createNewNote(newNote)
+    navigation.navigate("Note", {
+      item: newNote,
       isNew: true,
       folderName: name,
     });
