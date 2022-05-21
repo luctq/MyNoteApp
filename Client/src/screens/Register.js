@@ -9,25 +9,71 @@ import {
   Button,
   Dimensions,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import Constants from 'expo-constants'
+import FlashMessage from 'react-native-flash-message'
+import { connect } from 'react-redux'
 
 import BackButton from "../components/BackButton";
+import { resetStatus, register } from '../redux/reducers/Auth'
 
 var screen = Dimensions.get("window");
 
 
-export default function Register({ navigation }) {
+function Register({ navigation, auth, resetStatus, register }) {
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState('')
+
+  const registerRefMes = React.useRef()
 
   const handleBackPress = () => {
     navigation.goBack()
   }
 
+  const handleRegisterPress = () => {
+    if (confirmPassword !== password) {
+      registerRefMes.current.showMessage({
+        message: 'The password and confirm password are not the same',
+        type: 'warning',
+        duration: 2000
+      })
+    } else {
+      register(username, password)
+    }
+  }
+
+  React.useEffect(() => {
+    if (auth.status === 1) {
+      registerRefMes.current.showMessage({
+        message: auth.mes,
+        type: 'success',
+        duration: 2000
+      })
+      setTimeout(() => {
+        navigation.goBack()
+      }, 2000)
+    } 
+    if (auth.status === 0) {
+      registerRefMes.current.showMessage({
+        message: auth.mes,
+        type: 'danger',
+        duration: 2000,
+      })
+    }
+  }, [auth.status, auth.randomNumber])
+
+  React.useEffect(() => {
+    return () => {
+      resetStatus()
+    }
+  }, [])
+
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
       <Image style={styles.image} source={require("../../assets/logo.png")} />
 
@@ -36,16 +82,16 @@ export default function Register({ navigation }) {
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
-          placeholder="Email."
+          placeholder="Username..."
           placeholderTextColor="#003f5c"
-          onChangeText={(email) => setEmail(email)}
+          onChangeText={(username) => setUsername(username)}
         />
       </View>
 
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
-          placeholder="Password."
+          placeholder="Password..."
           placeholderTextColor="#003f5c"
           secureTextEntry={true}
           onChangeText={(password) => setPassword(password)}
@@ -55,17 +101,18 @@ export default function Register({ navigation }) {
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
-          placeholder="Confirm password"
+          placeholder="Confirm password..."
           placeholderTextColor="#003f5c"
           secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
+          onChangeText={password => setConfirmPassword(password)}
         />
       </View>
       
-      <TouchableOpacity style={styles.registerBtn}>
+      <TouchableOpacity style={styles.registerBtn} onPress={handleRegisterPress}>
         <Text style={styles.registerText}>Register</Text>
       </TouchableOpacity>
-    </View>
+      <FlashMessage position='top' ref={registerRefMes} />
+    </KeyboardAvoidingView>
   );
 }
 
@@ -125,3 +172,14 @@ const styles = StyleSheet.create({
     left: 6
   },
 });
+
+const mapStateToProps = state => ({
+  auth: state.auth
+})
+
+const mapActionToProps = {
+  resetStatus,
+  register
+}
+
+export default connect(mapStateToProps, mapActionToProps)(Register)

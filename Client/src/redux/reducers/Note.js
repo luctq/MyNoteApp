@@ -80,6 +80,9 @@ const note = createSlice({
         return note;
       });
     },
+    setNoteList(state, action) {
+      state.noteList = action.payload.notes
+    }
   },
 });
 
@@ -91,6 +94,7 @@ export const {
   deleteNoteInFolderById,
   expulsionNoteById,
   changeThemeScreen,
+  setNoteList
 } = note.actions;
 
 export const changeTheme = (id, theme) => (dispatch) => {

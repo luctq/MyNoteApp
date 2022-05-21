@@ -1,0 +1,72 @@
+
+###
+POST http://localhost:8080/login
+content-type: application/json
+
+{
+  "username": "youniginzu1",
+  "password": "@Yy12345"
+}
+
+###
+POST http://localhost:8080/login
+content-type: application/json
+
+{
+  "username": "youniginzu2",
+  "password": "@Qq808590"
+}
+
+###
+POST http://localhost:8080/register
+content-type: application/json
+
+{
+  "username": "youniginzu1",
+  "password": "@Yy12345"
+}
+
+###
+GET  http://localhost:8080/logout
+
+###
+POST http://localhost:8080/sync/uploadData
+Content-Type: application/json
+
+{
+  "folders": [
+    {
+      "id": 0,
+      "name": "ABC",
+      "noteCount": 1,
+      "isDeleted": false,
+      "deleteTime": null
+    }
+  ],
+  "notes": [
+    {
+      "id": 0,
+      "folderId": 0,
+      "title": "Hello",
+      "content": "<div>Hello</div>",
+      "lastEdit": "20220516",
+      "isDeleted": false,
+      "theme": "light"
+    }
+  ]
+}
+
+###
+GET http://localhost:8080/sync/downloadData
+
+###
+POST http://localhost:8080/share/shareNote
+content-type: application/json
+
+{
+  "id": 2,
+  "username": "youniginzu2"
+}
+
+###
+GET http://localhost:8080/share/getNotesShare

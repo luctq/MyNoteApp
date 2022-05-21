@@ -8,20 +8,72 @@ import {
 import React from "react";
 import Constants from "expo-constants";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { connect } from 'react-redux'
+import { useState } from "react";
+import FlashMessage from 'react-native-flash-message'
 
 import BackButton from "../components/BackButton";
+import DropDownOfSync from "../components/DropDownOfSync";
+import { logout, resetStatus, uploadData, downloadData } from '../redux/reducers/Auth'
 
-export default function Settings({ navigation }) {
+function Settings({ navigation, auth, logout, resetStatus, uploadData, downloadData, folders, notes }) {
+  const [isOpenDropDown, setIsOpenDropDown] = useState(false)
+
+  const settingRefMes = React.useRef()
+
+  React.useEffect(() => {
+    if (auth.status === 0) {
+      settingRefMes.current.showMessage({
+        message: auth.mes,
+        type: 'danger',
+        duration: 2000
+      })
+    }
+  }, [auth.status, auth.randomNumber])
+
+  React.useEffect(() => {
+    return () => {
+      resetStatus()
+    }
+  }, [])
+
   const handleBackPress = () => {
     navigation.goBack();
-  };
+  }
   const handleLoginPress = () => {
-    navigation.navigate("Login");
-  };
+    if (auth.isLogin) {
+      handleToggleDropDown()
+    } else {
+      resetStatus()
+      navigation.navigate("Login");
+    }
+  }
+  const handleToggleDropDown = () => {
+    setIsOpenDropDown(!isOpenDropDown)
+  }
+  const handleLogout = () => {
+    logout()
+  }
+  const handleUploadData = () => {
+    resetStatus()
+    uploadData(folders, notes)
+  }
+  const handleDownloadData = () => {
+    resetStatus()
+    downloadData()
+  }
 
   return (
     <View style={styles.container}>
       <BackButton style={styles.backButton} onBackPress={handleBackPress} />
+      <DropDownOfSync 
+        isOpen={isOpenDropDown} 
+        setIsOpen={handleToggleDropDown} 
+        onLogoutPress={handleLogout} 
+        onUploadPress={handleUploadData}
+        onDownloadPress={handleDownloadData}
+        isCloseLoading={auth.status === 1 ? true : false}
+      />
       <Text style={styles.header}>Ghi chú</Text>
       <View>
         <Text style={styles.title}>PHONG CÁCH</Text>
@@ -49,7 +101,7 @@ export default function Settings({ navigation }) {
       <View>
         <Text style={styles.title}>ĐỒNG BỘ HÓA</Text>
         <TouchableOpacity onPress={handleLoginPress} style={styles.settingRow}>
-          <Text style={styles.setting}>Đăng nhập</Text>
+          <Text style={styles.setting}>{auth.isLogin ? auth.username : 'Đăng nhập'}</Text>
           <MaterialCommunityIcons
             name="chevron-right"
             size={30}
@@ -99,6 +151,7 @@ export default function Settings({ navigation }) {
           />
         </Pressable>
       </View>
+      <FlashMessage position='top' ref={settingRefMes} />
     </View>
   );
 }
@@ -142,3 +195,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+  folders: state.folder.folderList,
+  notes: state.note.noteList,
+})
+
+const mapActionToProps = {
+  logout,
+  resetStatus,
+  uploadData,
+  downloadData
+}
+
+export default connect(mapStateToProps, mapActionToProps)(Settings)

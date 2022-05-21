@@ -65,7 +65,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
   const [isOpen, setIsOpen] = useState(false);
   const [proFocus, setProFocus] = useState({
     height: screen.height - 96.5,
-    isDisableButton: false
+    isDisableButton: note.isNoteShare ? true : false
   });
   const [noteTitle, setNoteTitle] = useState(note.title);
   const [noteContent, setNoteContent] = useState(note.content);
@@ -298,6 +298,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
         value={noteTitle}
         onChangeText={handleNoteTitleChange}
         style={styles.titleNote(theme)}
+        editable={note.isNoteShare ? false : true}
       />
       <View>
         <RichToolbar
@@ -358,6 +359,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
             style={styles.richEditor}
             onFocus={handleEditorFocus}
             onBlur={handleEditorBlur}
+            disabled={note.isNoteShare ? true : false}
           />
         </ScrollView>
       </View>

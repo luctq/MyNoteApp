@@ -10,10 +10,16 @@ import {
 import Modal from "react-native-modalbox";
 var screen = Dimensions.get("window");
 export default function ShareFormModal(props) {
+  const [username, setUsername] = useState('')
   const ref = useRef();
+
   const openModal = () => {
     ref.current.open();
   };
+  const handleShareNote = () => {
+    
+  }
+
   return (
     <Modal
       ref={ref}
@@ -24,18 +30,19 @@ export default function ShareFormModal(props) {
       onClosed={props.onClosed}
     >
       <View style={styles.input_container}>
-        <Text style={styles.input_label}>ID</Text>
+        <Text style={styles.input_label}>Username</Text>
         <TextInput
           autoFocus={true}
           style={styles.input}
-          placeholder="123456"
+          placeholder="Youni..."
+          onChangeText={username => setUsername(username)}
         ></TextInput>
       </View>
       <View style={styles.button_container}>
         <Pressable style={styles.button_cancel} onPress={() => ref.current.close()}>
           <Text style={{ color: "black" }}>Hủy</Text>
         </Pressable>
-        <Pressable style={styles.button_ok}>
+        <Pressable style={styles.button_ok} onPress={handleShareNote}>
           <Text style={{ color: "white" }}>OK</Text>
         </Pressable>
       </View>
@@ -65,7 +72,7 @@ const styles = StyleSheet.create({
     height: 30,
   },
   input_label: {
-    flex: 1,
+    flex: 5,
     fontSize: 20,
     fontWeight: "bold",
   },

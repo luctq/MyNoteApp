@@ -6,30 +6,58 @@ import {
   View,
   Image,
   TextInput,
-  Button,
   Dimensions,
   TouchableOpacity,
 } from "react-native";
 import Constants from 'expo-constants'
+import { connect } from 'react-redux'
+import FlashMessage from 'react-native-flash-message'
 
 import BackButton from "../components/BackButton";
+import {
+  login,
+  logout,
+  resetStatus
+} from '../redux/reducers/Auth.js'
 
 var screen = Dimensions.get("window");
-export default function Login({ login, navigation}) {
-  const [email, setEmail] = useState("");
+
+function Login({ login, navigation, auth, resetStatus }) {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  function handleLogin() {
-    // check email, password code before call login().... 
+  const loginRefMes = React.useRef()
 
-    // login(email, password);
-    // navigation.navigate(....)
+  React.useEffect(() => {
+    if (auth.status === 1) {
+      setTimeout(() => {
+        navigation.goBack()
+      }, 1000)
+    } 
+    if (auth.status === 0) {
+      loginRefMes.current.showMessage({
+        message: auth.mes,
+        type: 'danger',
+        duration: 2000
+      })
+    }
+  }, [auth.status, auth.randomNumber])
+
+  React.useEffect(() => {
+    return () => {
+      resetStatus()
+    }
+  }, [])
+
+  const handleLogin = () => {
+    login(username, password)
   }
 
   const handleBackPress = () => {
     navigation.goBack()
   }
   const handleRegisterPress = () => {
+    resetStatus()
     navigation.navigate('Register')
   }
 
@@ -43,16 +71,16 @@ export default function Login({ login, navigation}) {
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
-          placeholder="Email."
+          placeholder="Username..."
           placeholderTextColor="#003f5c"
-          onChangeText={(email) => setEmail(email)}
+          onChangeText={(username) => setUsername(username)}
         />
       </View>
 
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
-          placeholder="Password."
+          placeholder="Password..."
           placeholderTextColor="#003f5c"
           secureTextEntry={true}
           onChangeText={(password) => setPassword(password)}
@@ -70,7 +98,7 @@ export default function Login({ login, navigation}) {
         <Text style={styles.forgot_button}>Forgot your password?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.loginBtn}>
+      <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
         <Text style={styles.loginText}>LOGIN</Text>
       </TouchableOpacity>
       <View style={{ flexDirection: 'row'}}>
@@ -81,6 +109,7 @@ export default function Login({ login, navigation}) {
           <Text style={{ fontSize: 16, color: 'blue'}}>  Sign Up</Text>
         </TouchableOpacity>
       </View>
+      <FlashMessage position='top' ref={loginRefMes} />
     </View>
   );
 }
@@ -138,3 +167,15 @@ const styles = StyleSheet.create({
     left: 6
   },
 });
+
+const mapStateToProps = state => ({
+  auth: state.auth
+})
+
+const mapActionToProps = {
+  login,
+  logout,
+  resetStatus
+}
+
+export default connect(mapStateToProps, mapActionToProps)(Login)

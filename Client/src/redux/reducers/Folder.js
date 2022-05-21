@@ -59,6 +59,10 @@ const folder = createSlice({
         return folder;
       });
     },
+    setFolderList(state, action) {
+      state.folderList = action.payload.folders
+      state.folderCount = action.payload.folders.length
+    }
   },
 });
 
@@ -68,6 +72,7 @@ export const {
   restoreFolderById,
   incNoteCountById,
   decNoteCountById,
+  setFolderList
 } = folder.actions;
 
 export const createNewFolder = (info) => (dispatch) => {
