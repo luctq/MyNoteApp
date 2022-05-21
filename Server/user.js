@@ -1,5 +1,6 @@
 import express from 'express';
 import { db } from './firebase.js';
+import jwt from 'jsonwebtoken';
 
 import bcrypt from 'bcrypt';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
@@ -82,8 +83,9 @@ user.post('/signup', [validateSignUp, encryptPassword], async (req, res) => {
       username: req.body.username,
       password: req.body.password,
     });
-
-    res.send(`Document written with ID: ${docRef.id}`);
+    const user = { username: req.body.username, userId: docRef.id };
+    const token = generateToken(user);
+    res.send(token);
   } catch (e) {
     console.error(e);
   }
@@ -100,7 +102,9 @@ user.post('/signin', validateSignIn, async (req, res) => {
         doc.data().password
       );
       if (correctPassword) {
-        res.send('Đăng nhập thành công.');
+        const user = { username: req.body.username, userId: doc.id };
+        const token = generateToken(user);
+        res.send(token);
       } else {
         res.send('Sai mật khẩu.');
       }
@@ -110,5 +114,9 @@ user.post('/signin', validateSignIn, async (req, res) => {
     res.send('Tài khoản không tồn tại.');
   }
 });
+
+const generateToken = (user) => {
+  return jwt.sign(user, 'access_top_secret', { expiresIn: '30m' });
+};
 
 export { user };
