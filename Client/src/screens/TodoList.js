@@ -272,6 +272,9 @@ const styles = StyleSheet.create({
     bottom: 58,
     right: 25,
   },
+  folderRow: {
+    marginBottom: 20
+  }
 });
 
 export default connect(mapStateToProps, mapActionToProps)(TodoList);

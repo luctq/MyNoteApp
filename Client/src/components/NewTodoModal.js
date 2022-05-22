@@ -14,6 +14,7 @@ import { createNewFolder } from "../redux/reducers/Folder";
 import CheckBox from "react-native-check-box";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { createNewTodo, updateTodo } from "../redux/reducers/Todo";
+import AlarmPicker from "./AlarmPicker";
 var screen = Dimensions.get("window");
 
 const mapStateToProps = (state) => ({});
@@ -53,14 +54,14 @@ function NewTodoModal(props) {
     }
   };
   const handleSubmitEditTodo = async (id) => {
-      if (contentEditTodo != "") {
-          props.updateTodo(id, contentEditTodo, isSelected)
-          ref.current.close()
-      }
+    if (contentEditTodo != "") {
+      props.updateTodo(id, contentEditTodo, isSelected);
+      ref.current.close();
+    }
   };
   useEffect(() => {
     setSelection(props.type.type === "editTodoModalIsSelected");
-    setContentEditTodo(props.type.todo.content)
+    setContentEditTodo(props.type.todo.content);
   }, [props.isOpen]);
   return (
     <Modal
@@ -105,21 +106,7 @@ function NewTodoModal(props) {
           />
         )}
       </View>
-      <TouchableOpacity
-        style={{
-          position: "absolute",
-          bottom: 10,
-          left: 20,
-          borderRadius: 20,
-          backgroundColor: "#f8f6eb",
-          padding: 5,
-        }}
-      >
-        <View style={{ flexDirection: "row" }}>
-          <MaterialIcons name="alarm" size={20} color="#000" />
-          <Text> Đặt nhắc nhở</Text>
-        </View>
-      </TouchableOpacity>
+      <AlarmPicker type="button" />
       {props.type.type === "newTodoModal" ? (
         <TouchableOpacity
           style={{ position: "absolute", bottom: 10, right: 20, padding: 5 }}

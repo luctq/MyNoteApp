@@ -23,6 +23,7 @@ import {
   StyleSheet
 } from "react-native";
 import SetTimeForm from "./SetTimeForm";
+import AlarmPicker from './AlarmPicker'
 const screen = Dimensions.get('window');
 export default function DropDownOfThreeDot(props) {
 
@@ -58,15 +59,19 @@ export default function DropDownOfThreeDot(props) {
             style={styles.modal}
           >
             {options.map((item, index) => {
-              return (
-                <TouchableOpacity key={index} onPress={() => handleSelect(item)}>
-                  <View>
-                    <Text style={styles.optionStyle}>
-                      {item}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
+              if (item === "Nhắc nhở") {
+                return (<AlarmPicker key={index}/>)
+              } else {
+                return (
+                  <TouchableOpacity key={index} onPress={() => handleSelect(item)}>
+                    <View>
+                      <Text style={styles.optionStyle}>
+                        {item}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              }
             })}
           </View>
         </View>
