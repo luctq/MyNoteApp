@@ -61,6 +61,9 @@ const note = createSlice({
         (note, index) => note.id !== action.payload
       );
     },
+    expulsionNoteInFolderById(state, action) {
+      state.noteList = state.noteList.filter(note => note.folderId !== action.payload);
+    },
     changeThemeScreen(state, action) {
       state.noteList = state.noteList.filter((note, index) => {
         if (note.id === action.payload.id) {
@@ -87,7 +90,8 @@ export const {
   expulsionNoteById,
   changeThemeScreen,
   setNoteList,
-  resetNoteList
+  resetNoteList,
+  expulsionNoteInFolderById
 } = note.actions;
 
 export const changeTheme = (id, theme) => (dispatch) => {
@@ -158,6 +162,7 @@ export const deleteNoteInFolder = (folderId) => (dispatch) => {
 };
 
 export const updateNote = (note) => (dispatch) => {
+  if (note.isNoteShare) return
   fetch(`${serverApi}/sync/updateNote`, {
     method: 'POST',
     headers: {
@@ -187,5 +192,9 @@ export const expulsionNote = (note) => (dispatch) => {
   dispatch(expulsionNoteById(note.id));
   dispatch(decNoteCountById(note.folderId));
 };
+
+export const expulsionNoteInFolder = (folderId) => (dispatch) => {
+  dispatch(expulsionNoteInFolderById(folderId))
+}
 
 export default note.reducer;

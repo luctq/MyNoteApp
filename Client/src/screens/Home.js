@@ -12,8 +12,8 @@ import DeleteButton from "../components/DeleteButton";
 import DropDownOfFolder from "../components/DropDownOfFolder";
 import AntIcons from "react-native-vector-icons/AntDesign";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { deleteFolder } from "../redux/reducers/Folder";
-import { deleteNoteInFolder } from "../redux/reducers/Note";
+import { deleteFolder, expulsionFolder } from "../redux/reducers/Folder";
+import { deleteNoteInFolder, expulsionNoteInFolder } from "../redux/reducers/Note";
 
 const mapStateToProps = (state) => ({
   folderList: state.folder.folderList,
@@ -23,6 +23,8 @@ const mapStateToProps = (state) => ({
 const mapActionToProps = {
   deleteFolder,
   deleteNoteInFolder,
+  expulsionFolder,
+  expulsionNoteInFolder
 };
 
 function Home({
@@ -31,6 +33,8 @@ function Home({
   folderCount,
   deleteFolder,
   deleteNoteInFolder,
+  expulsionFolder,
+  expulsionNoteInFolder
 }) {
   const [isOpenDropDown, setIsOpenDropDown] = useState(false);
   const [textSearch, setTextSearch] = useState("");
@@ -47,12 +51,17 @@ function Home({
   const handleRecycleBinPress = () => {
     navigation.navigate("RecycleBin");
   };
-  const handleFolderListItemPress = (id, name) => {
-    navigation.navigate("Folder", { name, id });
+  const handleFolderListItemPress = (id, name, isFolderShare) => {
+    navigation.navigate("Folder", { name, id, isFolderShare });
   };
-  const handleDeleteFolder = (id) => {
-    deleteNoteInFolder(id);
-    deleteFolder(id);
+  const handleDeleteFolder = (item) => {
+    if (item.isFolderShare) {
+      expulsionFolder(item.id)
+      expulsionNoteInFolder(item.id)
+    } else {
+      deleteNoteInFolder(item.id);
+      deleteFolder(item.id);
+    }
   };
   const renderItem = (data, rowMap) => {
     if (
@@ -68,12 +77,12 @@ function Home({
         >
           <DeleteButton
             style={styles.deleteButton}
-            onDeletePress={() => handleDeleteFolder(data.item.id)}
+            onDeletePress={() => handleDeleteFolder(data.item)}
           />
           <FolderListItem
             style={styles.folderListItem}
             onFolderListItemPress={() =>
-              handleFolderListItemPress(data.item.id, data.item.name)
+              handleFolderListItemPress(data.item.id, data.item.name, data.item.isFolderShare)
             }
             info={data.item}
           />

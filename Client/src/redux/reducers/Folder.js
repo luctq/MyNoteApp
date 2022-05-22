@@ -57,6 +57,10 @@ const folder = createSlice({
     resetFolderList(state, action) {
       state.folderList = []
       state.folderCount = 0
+    },
+    expulsionFolderById(state, action) {
+      state.folderList = state.folderList.filter(folder => folder.id !== action.payload);
+      state.folderCount--;
     }
   },
 });
@@ -68,7 +72,8 @@ export const {
   incNoteCountById,
   decNoteCountById,
   setFolderList,
-  resetFolderList
+  resetFolderList,
+  expulsionFolderById
 } = folder.actions;
 
 export const createNewFolder = (info) => (dispatch) => {
@@ -104,5 +109,9 @@ export const deleteFolder = (id) => (dispatch) => {
 export const restoreFolder = (id) => (dispatch) => {
   dispatch(restoreFolderById(id));
 };
+
+export const expulsionFolder = (id) => (dispatch) => {
+  dispatch(expulsionFolderById(id))
+}
 
 export default folder.reducer;

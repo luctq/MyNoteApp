@@ -10,7 +10,7 @@ import NoteListItem from "../components/NoteListItem";
 import AddNewNoteButton from "../components/AddNewNoteButton";
 import DeleteButton from "../components/DeleteButton";
 import BackButton from "../components/BackButton";
-import { deleteNote, createNewNote } from "../redux/reducers/Note";
+import { deleteNote, createNewNote, expulsionNote } from "../redux/reducers/Note";
 import { makeId } from "../redux/reducers/Todo";
 
 const mapStateToProps = (state) => ({
@@ -19,17 +19,26 @@ const mapStateToProps = (state) => ({
 
 const mapActionToProps = {
   deleteNote,
-  createNewNote
+  createNewNote,
+  expulsionNote
 };
 
-function Folder({ navigation, noteList, route, deleteNote, createNewNote }) {
+function Folder({ navigation, noteList, route, deleteNote, createNewNote, expulsionNote }) {
   const id = route.params.id;
   const name = route.params.name;
+  const isFolderShare = route.params.isFolderShare;
   const [textSearch, setTextSearch] = useState("");
 
   const noteListInFolder = noteList.filter((note, index) => {
     return note.folderId === id;
   });
+  const handleDeleteNote = (item) => {
+    if (item.isNoteShare) {
+      expulsionNote(item)
+    } else {
+      deleteNote(item)
+    }
+  }
   const renderItem = (data, rowMap) => {
     if (
       !data.item.isDeleted &&
@@ -45,7 +54,7 @@ function Folder({ navigation, noteList, route, deleteNote, createNewNote }) {
         >
           <DeleteButton
             style={styles.deleteButton}
-            onDeletePress={() => deleteNote(data.item)}
+            onDeletePress={() => handleDeleteNote(data.item)}
           />
           <NoteListItem
             style={styles.noteListItem}
@@ -100,6 +109,7 @@ function Folder({ navigation, noteList, route, deleteNote, createNewNote }) {
       <AddNewNoteButton
         style={styles.addNewNoteButton}
         onAddNewNotePress={handleAddNewNotePress}
+        isHide={isFolderShare ? true : false}
       />
     </View>
   );

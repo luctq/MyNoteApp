@@ -5,6 +5,7 @@ const Folder = require('../models/Folder')
 const Note = require('../models/Note')
 const User = require('../models/User')
 const NoteShare = require('../models/NoteShare')
+const makeId = require('../logic/generateId')
 
 class SyncDataController {
   async uploadData(req, res) {
@@ -94,14 +95,14 @@ class SyncDataController {
       await Folder.sync()
       let folders = await user.getFolders()
       let result = []
-      const nextFolderId = folders.length === 0 ? 0 : folders[folders.length - 1].id + 1
+      const shareFolderId = makeId(10)
       await Note.sync()
       await NoteShare.sync()
       const noteShares = await NoteShare.findAll()
       for (const noteShare of noteShares) {
         if (noteShare.getDataValue('userIds').includes(req.session.username))  {
           const note = await noteShare.getNote()
-          note.folderId = nextFolderId
+          note.folderId = shareFolderId
           note.dataValues.isNoteShare = true
           result.push(note)
         }
@@ -111,7 +112,7 @@ class SyncDataController {
         notes = notes.concat(await folder.getNotes())
       }
       if (result.length !== 0) {
-        folders.push({ id: nextFolderId, name: 'Thư mục chia sẻ', noteCount: result.length, isDeleted: false, deleteTime: null  })
+        folders.push({ id: shareFolderId, name: 'Thư mục chia sẻ', noteCount: result.length, isDeleted: false, deleteTime: null, isFolderShare: true  })
       }
       notes = notes.concat(result)
       await new Promise(resolve => setTimeout(resolve, 2000))
@@ -144,8 +145,10 @@ class SyncDataController {
             id
           }
         })
+        return res.json({ status: 1, mes: 'Change theme success' })
+      } else {
+        return res.json({ status: 0, mes: 'Access denied' })
       }
-      return res.json({ status: 1, mes: 'Change theme success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
@@ -215,8 +218,10 @@ class SyncDataController {
             id: folder.id
           }
         })
+        return res.json({ status: 1, mes: 'Delete note success' })
+      } else {
+        return res.json({ status: 0, mes: 'Access denied' })
       }
-      return res.json({ status: 1, mes: 'Delete note success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
@@ -262,8 +267,10 @@ class SyncDataController {
             id
           }
         })
+        return res.json({ status: 1, mes: 'Restore note success' })
+      } else {
+        return res.json({ status: 0, mes: 'Access denied' })
       }
-      return res.json({ status: 1, mes: 'Restore note success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
@@ -296,8 +303,10 @@ class SyncDataController {
             id: note.folderId
           }
         })
+        return res.json({ status: 1, mes: 'Expulsion note success' })
+      } else {
+        return res.json({ status: 0, mes: 'Access denied' })
       }
-      return res.json({ status: 1, mes: 'Expulsion note success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
@@ -312,6 +321,9 @@ class SyncDataController {
           id: note.folderId
         }
       })
+      if (!folder) {
+        return res.json({ status: 0, mes: 'Access denied' })
+      }
       if (folder.userId === req.session.userId) {
         const regex = /src="(data:image\/png;base64,|data:audio\/mp4;base64,)([+:/=;,A-Za-z\s0-9]+)"/g
         var m, output = []
@@ -350,8 +362,10 @@ class SyncDataController {
             id: note.id
           }
         })
+        return res.json({ status: 1, mes: 'Update note success' })
+      } else {
+        return res.json({ status: 0, mes: 'Access denied' })
       }
-      return res.json({ status: 1, mes: 'Update note success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
@@ -390,7 +404,7 @@ class SyncDataController {
         }
       })
       if (!folder) {
-        return res.json({ status: 1, mes: 'Delete folder success' })
+        return res.json({ status: 0, mes: 'Access denied' })
       }
       if (folder.userId === req.session.userId) {
         if (folder.noteCount === 0) {
@@ -415,8 +429,10 @@ class SyncDataController {
             }
           })
         }
+        return res.json({ status: 1, mes: 'Delete folder success' })
+      } else {
+        return res.json({ status: 0, mes: 'Access denied' })
       }
-      return res.json({ status: 1, mes: 'Delete folder success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })

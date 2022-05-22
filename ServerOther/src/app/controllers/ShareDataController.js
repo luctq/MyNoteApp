@@ -33,8 +33,10 @@ class ShareDataController {
           })
           newNoteShare.setNote(note)
         }
+        return res.json({ status: 1, mes: 'Share note success' })
+      } else {
+        return res.json({ status: 0, mes: 'Can not share your self' })
       }
-      return res.json({ status: 1, mes: 'Share note success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
