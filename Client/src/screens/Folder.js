@@ -11,6 +11,7 @@ import AddNewNoteButton from "../components/AddNewNoteButton";
 import DeleteButton from "../components/DeleteButton";
 import BackButton from "../components/BackButton";
 import { deleteNote, createNewNote } from "../redux/reducers/Note";
+import { makeId } from "../redux/reducers/Todo";
 
 const mapStateToProps = (state) => ({
   noteList: state.note.noteList,
@@ -63,9 +64,9 @@ function Folder({ navigation, noteList, route, deleteNote, createNewNote }) {
     navigation.navigate("Note", { item, isNew: false, folderName: name, });
   };
   const handleAddNewNotePress = async () => {
-    const nextId = noteList.length === 0 ? 0 : noteList[noteList.length - 1].id + 1
+    // const nextId = noteList.length === 0 ? 0 : noteList[noteList.length - 1].id + 1
     const newNote = {
-      id: nextId,
+      id: makeId(10),
       folderId: id,
       title: "",
       content: "",

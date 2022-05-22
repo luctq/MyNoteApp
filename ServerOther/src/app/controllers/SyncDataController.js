@@ -153,6 +153,8 @@ class SyncDataController {
   async createNewNote(req, res) {
     const { note } = req.body
     try {
+      //bug
+      console.log(note)
       const folder = await Folder.findOne({
         where: {
           id: note.folderId
@@ -160,6 +162,7 @@ class SyncDataController {
       })
       if (folder.userId === req.session.userId) {
         const newNote = await Note.create({
+          id: note.id,
           title: note.title,
           content: note.content,
           lastEdit: note.lastEdit,
@@ -174,8 +177,10 @@ class SyncDataController {
             id: folder.id
           }
         })
+        return res.json({ status: 1, mes: 'Add note success', id: newNote.id })
+      } else {
+        return res.json({ status: 0, mes: 'Access denied' })
       }
-      return res.json({ status: 1, mes: 'Add note success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
@@ -362,13 +367,14 @@ class SyncDataController {
         }
       })
       const newFolder = await Folder.create({
+        id: folder.id,
         name: folder.name,
         noteCount: folder.noteCount,
         isDeleted: folder.isDeleted,
         deleteTime: folder.deleteTime
       })
       user.addFolders(newFolder)
-      return res.json({ status: 1, mes: 'Create new folder success' })
+      return res.json({ status: 1, mes: 'Create new folder success', id: newFolder.id })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })

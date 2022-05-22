@@ -12,10 +12,9 @@ class Note extends Model {
 
 Note.init({
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     primaryKey: true,
     allowNull: false,
-    autoIncrement: true
   },
   title: {
     type: DataTypes.STRING,

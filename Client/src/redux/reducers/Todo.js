@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const makeId = (length) => {
+export const makeId = (length) => {
   var result = "";
   var characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
