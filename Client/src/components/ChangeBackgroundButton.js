@@ -2,10 +2,10 @@ import { useState } from "react";
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import AntIcons from 'react-native-vector-icons/AntDesign'
 import ChangeBackgroundModal from "./ChangeBackgroundModal";
-function ChangeBackgroundButton({ style, onButtonChangeBackground,  isDisable, iconColor }) {
+function ChangeBackgroundButton({ style, onButtonChangeBackground,  isDisable, iconColor, isHide }) {
   const [isOpen, setIsOpen] = useState(false)
   return (
-    <View style={style}>
+    <View style={[style, { display: isHide ? 'none' : 'flex' }]}>
       <ChangeBackgroundModal isOpen={isOpen} onClosed={() => setIsOpen(false)}/>
       <TouchableOpacity 
         style={styles.container(isDisable)} 

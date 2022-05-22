@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Dimensions,
-  StyleSheet
+  StyleSheet,
+  Alert
 } from "react-native"
 
 import LoadingModal from "./LoadingModal";
@@ -23,9 +24,18 @@ function DropDownOfSync(props) {
       props.setIsOpen()
       props.onDownloadPress()
     } else if (option === 'Tải dữ liệu lên web') {
-      setIsOpenModal(true)
-      props.setIsOpen()
-      props.onUploadPress()
+      Alert.alert('Upload', 'Hành động này sẽ ghi đè toàn bộ dữ liệu trên cloud. Bạn chắc chứ?', [
+        {text: 'Hủy', style: 'cancel'}, 
+        {
+          text: 'Chấp nhận', 
+          style: 'default',
+          onPress: () => {
+            setIsOpenModal(true)
+            props.setIsOpen()
+            props.onUploadPress()
+          }
+        }
+      ])
     } else if (option === 'Đăng xuất') {
       props.onLogoutPress()
       props.setIsOpen()

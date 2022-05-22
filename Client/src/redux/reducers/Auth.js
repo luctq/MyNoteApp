@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { setFolderList } from "./Folder";
-import { setNoteList } from "./Note";
+import { setFolderList, resetFolderList } from "./Folder";
+import { setNoteList, resetNoteList } from "./Note";
 
 const initialState = {
   isLogin: false,
@@ -101,6 +101,8 @@ export const logout = () => (dispatch) => {
   })
   .then(res => res.json())
   .then(result => {
+    dispatch(resetNoteList())
+    dispatch(resetFolderList())
     dispatch(logoutComplete({ status: result.status, mes: result.mes }))
   })
 }
@@ -130,6 +132,22 @@ export const downloadData = () => (dispatch) => {
       dispatch(setNoteList({ notes: result.data.notes }))
     }
     dispatch(downloadDataComplete({ status: result.status, mes: result.mes }))
+  })
+}
+
+export const shareData = (id, username) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/share/shareNote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id, username})
+  })
+  .then(res => res.json())
+  .then(result => {
+    if (result.status === 1) {
+      console.log('share success')
+    }
   })
 }
 

@@ -11,17 +11,7 @@ const folder = createSlice({
   reducers: {
     // các actions
     addFolder(state, action) {
-      var lastId = 0;
-      if (state.folderList.length !== 0)
-        lastId = state.folderList[state.folderList.length - 1].id + 1;
-      const newFolder = {
-        id: lastId, // lấy id của phần tử cuối cùng + 1
-        name: action.payload.name,
-        noteCount: 0,
-        isDeleted: false,
-        deleteTime: null,
-      };
-      state.folderList.push(newFolder);
+      state.folderList.push(action.payload);
       state.folderCount++;
     },
     deleteFolderById(state, action) {
@@ -62,6 +52,10 @@ const folder = createSlice({
     setFolderList(state, action) {
       state.folderList = action.payload.folders
       state.folderCount = action.payload.folders.length
+    },
+    resetFolderList(state, action) {
+      state.folderList = []
+      state.folderCount = 0
     }
   },
 });
@@ -72,14 +66,37 @@ export const {
   restoreFolderById,
   incNoteCountById,
   decNoteCountById,
-  setFolderList
+  setFolderList,
+  resetFolderList
 } = folder.actions;
 
 export const createNewFolder = (info) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/sync/createNewFolder', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({folder: info})
+  })
+  .then(res => res.json())
+  .then(result => {
+    console.log(result.mes)
+  })
   dispatch(addFolder(info));
 };
 
 export const deleteFolder = (id) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/sync/deleteFolder', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id})
+  })
+  .then(res => res.json())
+  .then(result => {
+    console.log(result.mes)
+  })
   dispatch(deleteFolderById(id));
 };
 

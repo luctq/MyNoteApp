@@ -17,7 +17,10 @@ export default function ShareFormModal(props) {
     ref.current.open();
   };
   const handleShareNote = () => {
-    
+    if (username) {
+      props.handleShareData(username)
+    }
+    ref.current.close()
   }
 
   return (

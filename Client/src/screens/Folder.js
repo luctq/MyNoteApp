@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
 import Constants from "expo-constants";
 import { connect } from "react-redux";
+import moment from "moment";
 
 import SearchBar from "../components/SearchBar";
 import NoteListItem from "../components/NoteListItem";
@@ -62,15 +63,16 @@ function Folder({ navigation, noteList, route, deleteNote, createNewNote }) {
     navigation.navigate("Note", { item, isNew: false, folderName: name, });
   };
   const handleAddNewNotePress = async () => {
+    const nextId = noteList.length === 0 ? 0 : noteList[noteList.length - 1].id + 1
     const newNote = {
-        id: noteList.length,
-        folderId: id,
-        title: "",
-        content: "",
-        lastEdit: null,
-        isDeleted: false,
-        deleteTime: null,
-        theme: "light"
+      id: nextId,
+      folderId: id,
+      title: "",
+      content: "",
+      lastEdit: moment().format("YYYYMMDDHHmmss"),
+      isDeleted: false,
+      deleteTime: null,
+      theme: "light"
     }
     await createNewNote(newNote)
     navigation.navigate("Note", {

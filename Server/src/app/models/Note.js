@@ -1,6 +1,7 @@
 const { Model, DataTypes } = require('sequelize')
-const db = require('../../config/NoteDB')
+const { Buffer } = require('node:buffer')
 
+const db = require('../../config/NoteDB')
 const Folder = require('./Folder')
 
 const sequelize = db.sequelize
@@ -21,8 +22,8 @@ Note.init({
     allowNull: false
   },
   content: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: DataTypes.TEXT,
+    allowNull: false,
   },
   lastEdit: {
     type: DataTypes.STRING,
@@ -30,6 +31,10 @@ Note.init({
   },
   isDeleted: {
     type: DataTypes.BOOLEAN,
+    allowNull: false
+  },
+  theme: {
+    type: DataTypes.STRING,
     allowNull: false
   }
 }, {

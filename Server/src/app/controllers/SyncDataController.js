@@ -1,3 +1,5 @@
+const { Buffer } = require('node:buffer')
+const fs = require('fs')
 
 const Folder = require('../models/Folder')
 const Note = require('../models/Note')
@@ -7,11 +9,13 @@ const NoteShare = require('../models/NoteShare')
 class SyncDataController {
   async uploadData(req, res) {
     const { folders, notes } = req.body
+    await User.sync()
     const user = await User.findOne({
       where: {
         userId: req.session.userId
       }
     })
+    await Folder.sync()
     await Folder.destroy({
       where: {
         userId: req.session.userId
@@ -19,7 +23,7 @@ class SyncDataController {
     })
     try {
       for (const folder of folders) {
-        await Folder.sync()
+        await Note.sync()
         const newFolder = await Folder.create({
           name: folder.name,
           noteCount: folder.noteCount,
@@ -30,12 +34,40 @@ class SyncDataController {
           return note.folderId === folder.id
         })
         for (const note of notesInFolder) {
-          await Note.sync()
+          const regex = /src="(data:image\/png;base64,|data:audio\/mp4;base64,)([+:/=;,A-Za-z\s0-9]+)"/g
+          var m, output = []
+          do {
+            m = regex.exec(note.content)
+            if (m) {
+              output.push({ type: m[1], data: m[2] })
+            }
+          } while (m)
+          let i = 0
+          for (const r of output) {
+            i++
+            if (r.type === 'data:image/png;base64,') {
+              const regex1 = /data:image\/png;base64,([+:/=;,A-Za-z\s0-9]+)/
+              fs.writeFile(`./public/images/${note.lastEdit}${i}.png`, r.data, 'base64', (err) => {
+                if (err) return console.error(err);
+                console.log('File saved')
+              })
+              note.content = note.content.replace(regex1, `http://192.168.113.107:8080/images/${note.lastEdit}${i}.png`)
+            }
+            if (r.type === 'data:audio/mp4;base64,') {
+              const regex1 = /data:audio\/mp4;base64,([+:/=;,A-Za-z\s0-9]+)/
+              fs.writeFile(`./public/audios/${note.lastEdit}${i}.mp4`, r.data, 'base64', (err) => {
+                if (err) return console.error(err);
+                console.log('File saved')
+              })
+              note.content = note.content.replace(regex1, `http://192.168.113.107:8080/audios/${note.lastEdit}${i}.mp4`)
+            }
+          }
           const newNote = await Note.create({
             title: note.title,
             content: note.content,
             lastEdit: note.lastEdit,
             isDeleted: note.isDeleted,
+            theme: note.theme
           })
           newFolder.addNotes(newNote)
         }
@@ -51,20 +83,24 @@ class SyncDataController {
 
   async downloadData(req, res) {
     try {
+      await User.sync()
       const user = await User.findOne({
         where: {
           userId: req.session.userId
         }
       })
+      await Folder.sync()
       let folders = await user.getFolders()
       let result = []
       const nextFolderId = folders.length === 0 ? 0 : folders[folders.length - 1].id + 1
+      await Note.sync()
+      await NoteShare.sync()
       const noteShares = await NoteShare.findAll()
       for (const noteShare of noteShares) {
         if (noteShare.getDataValue('userIds').includes(req.session.username))  {
           const note = await noteShare.getNote()
           note.folderId = nextFolderId
-          note.isNoteShare = true
+          note.dataValues.isNoteShare = true
           result.push(note)
         }
       }
@@ -84,21 +120,61 @@ class SyncDataController {
     }
   }
 
+  async changeTheme(req, res) {
+    const { id, theme, lastEdit } = req.body
+    try {
+      const note = await Note.findOne({
+        where: {
+          id
+        }
+      })
+      const folder = await Folder.findOne({
+        where: {
+          id: note.folderId
+        }
+      })
+      if (folder.userId === req.session.userId) {
+        await Note.update({
+          theme: theme,
+          lastEdit: lastEdit
+        }, {
+          where: {
+            id
+          }
+        })
+      }
+      return res.json({ status: 1, mes: 'Change theme success' })
+    } catch (e) {
+      console.log(e)
+      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+    }
+  }
+
   async createNewNote(req, res) {
     const { note } = req.body
     try {
       const folder = await Folder.findOne({
         where: {
-          folderId: note.folderId
+          id: note.folderId
         }
       })
-      const newNote = await Note.create({
-        noteTitle: note.noteTitle,
-        noteContent: note.noteContent,
-        lastEdit: note.lastEdit,
-        isDeleted: note.isDeleted
-      })
-      folder.addNotes(newNote)
+      if (folder.userId === req.session.userId) {
+        const newNote = await Note.create({
+          title: note.title,
+          content: note.content,
+          lastEdit: note.lastEdit,
+          isDeleted: note.isDeleted,
+          theme: note.theme
+        })
+        folder.addNotes(newNote)
+        await Folder.update({
+          noteCount: folder.noteCount + 1
+        }, {
+          where: {
+            id: folder.id
+          }
+        })
+      }
       return res.json({ status: 1, mes: 'Add note success' })
     } catch (e) {
       console.log(e)
@@ -107,15 +183,34 @@ class SyncDataController {
   }
 
   async deleteNote(req, res) {
-    const { noteId } = req.body
+    const { id } = req.body
     try {
-      await Note.update({
-        isDeleted: true
-      }, {
+      const note = await Note.findOne({
         where: {
-          noteId
+          id
         }
       })
+      const folder = await Folder.findOne({
+        where: {
+          id: note.folderId
+        }
+      })
+      if (folder.userId === req.session.userId) {
+        await Note.update({
+          isDeleted: true
+        }, {
+          where: {
+            id
+          }
+        })
+        await Folder.update({
+          noteCount: folder.noteCount - 1
+        }, {
+          where: {
+            id: folder.id
+          }
+        })
+      }
       return res.json({ status: 1, mes: 'Delete note success' })
     } catch (e) {
       console.log(e)
@@ -124,16 +219,80 @@ class SyncDataController {
   }
 
   async restoreNote(req, res) {
-    const { noteId } = req.body
+    const { id } = req.body
     try {
-      await Note.update({
-        isDeleted: false
-      }, {
+      const note = await Note.findOne({
         where: {
-          noteId
+          id
         }
       })
+      const folder = await Folder.findOne({
+        where: {
+          id: note.folderId
+        }
+      })
+      if (folder.userId === req.session.userId) {
+        if (folder.isDeleted === true) {
+          await Folder.update({
+            isDeleted: false,
+            noteCount: 1
+          }, {
+            where: {
+              id: note.folderId
+            }
+          })
+        } else {
+          await Folder.update({
+            noteCount: folder.noteCount + 1
+          }, {
+            where: {
+              id: note.folderId
+            }
+          })
+        }
+        await Note.update({
+          isDeleted: false
+        }, {
+          where: {
+            id
+          }
+        })
+      }
       return res.json({ status: 1, mes: 'Restore note success' })
+    } catch (e) {
+      console.log(e)
+      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+    }
+  }
+
+  async expulsionNote(req, res) {
+    const { id } = req.body
+    try {
+      const note = await Note.findOne({
+        where: {
+          id
+        }
+      })
+      const folder = await Folder.findOne({
+        where: {
+          id: note.folderId
+        }
+      })
+      if (folder.userId === req.session.userId) {
+        await Note.destroy({
+          where: {
+            id
+          }
+        })
+        await Folder.update({
+          noteCount: folder.noteCount - 1
+        }, {
+          where: {
+            id: note.folderId
+          }
+        })
+      }
+      return res.json({ status: 1, mes: 'Expulsion note success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
@@ -143,13 +302,50 @@ class SyncDataController {
   async updateNote(req, res) {
     const { note } = req.body
     try {
-      await Note.update({
-        noteTitle: note.noteTitle,
-        noteContent: note.noteContent,
-        lastEdit: note.lastEdit
-      }, {
-        where: note.noteId
+      const folder = await Folder.findOne({
+        where: {
+          id: note.folderId
+        }
       })
+      if (folder.userId === req.session.userId) {
+        const regex = /src="(data:image\/png;base64,|data:audio\/mp4;base64,)([+:/=;,A-Za-z\s0-9]+)"/g
+        var m, output = []
+        do {
+          m = regex.exec(note.content)
+          if (m) {
+            output.push({ type: m[1], data: m[2] })
+          }
+        } while (m)
+        let i = 0
+        for (const r of output) {
+          i++
+          if (r.type === 'data:image/png;base64,') {
+            const regex1 = /data:image\/png;base64,([+:/=;,A-Za-z\s0-9]+)/
+            fs.writeFile(`./public/images/${note.lastEdit}${i}.png`, r.data, 'base64', (err) => {
+              if (err) return console.error(err);
+              console.log('File saved')
+            })
+            note.content = note.content.replace(regex1, `http://192.168.113.107:8080/images/${note.lastEdit}${i}.png`)
+          }
+          if (r.type === 'data:audio/mp4;base64,') {
+            const regex1 = /data:audio\/mp4;base64,([+:/=;,A-Za-z\s0-9]+)/
+            fs.writeFile(`./public/audios/${note.lastEdit}${i}.mp4`, r.data, 'base64', (err) => {
+              if (err) return console.error(err);
+              console.log('File saved')
+            })
+            note.content = note.content.replace(regex1, `http://192.168.113.107:8080/audios/${note.lastEdit}${i}.mp4`)
+          }
+        }
+        await Note.update({
+          title: note.title,
+          content: note.content,
+          lastEdit: note.lastEdit
+        }, {
+          where: {
+            id: note.id
+          }
+        })
+      }
       return res.json({ status: 1, mes: 'Update note success' })
     } catch (e) {
       console.log(e)
@@ -166,12 +362,13 @@ class SyncDataController {
         }
       })
       const newFolder = await Folder.create({
-        folderName: folder.folderName,
+        name: folder.name,
         noteCount: folder.noteCount,
         isDeleted: folder.isDeleted,
         deleteTime: folder.deleteTime
       })
       user.addFolders(newFolder)
+      return res.json({ status: 1, mes: 'Create new folder success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })
@@ -179,33 +376,41 @@ class SyncDataController {
   }
 
   async deleteFolder(req, res) {
-    const { folderId } = req.body
+    const { id } = req.body
     try {
-      await Folder.update({
-        isDeleted: true
-      }, {
+      const folder = await Folder.findOne({
         where: {
-          folderId
+          id
         }
       })
+      if (!folder) {
+        return res.json({ status: 1, mes: 'Delete folder success' })
+      }
+      if (folder.userId === req.session.userId) {
+        if (folder.noteCount === 0) {
+          await Folder.destroy({
+            where: {
+              id
+            }
+          })
+        } else {
+          await Folder.update({
+            isDeleted: true
+          }, {
+            where: {
+              id
+            }
+          })
+          await Note.update({
+            isDeleted: true
+          }, {
+            where: {
+              folderId: id
+            }
+          })
+        }
+      }
       return res.json({ status: 1, mes: 'Delete folder success' })
-    } catch (e) {
-      console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
-    }
-  }
-
-  async restoreFolder(req, res) {
-    const { folderId } = req.body
-    try {
-      await Folder.update({
-        isDeleted: false
-      }, {
-        where: {
-          folderId
-        }
-      })
-      return res.json({ status: 1, mes: 'Restore folder success' })
     } catch (e) {
       console.log(e)
       return res.json({ status: 0, mes: 'An error has occurred in the system' })

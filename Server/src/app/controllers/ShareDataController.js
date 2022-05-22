@@ -5,6 +5,8 @@ const { validationUsername } = require('../validations/UserValidation')
 class ShareDataController {
   async shareNote(req, res) {
     try {
+      await Note.sync()
+      await NoteShare.sync()
       const { id, username } = req.body
       const note = await Note.findOne({
         where: {
@@ -17,19 +19,20 @@ class ShareDataController {
       } else if (result.status === -1) {
         return res.json({ status: 0, mes: 'An error has occurred in the system' })
       }
-      await NoteShare.sync()
-      const noteShare = await NoteShare.findOne({
-        where: {
-          noteId: id
-        }
-      })
-      if (noteShare) {
-        noteShare.setDataValue('userIds', noteShare.getDataValue('userIds').concat([username]))
-      } else {
-        const newNoteShare = await NoteShare.create({
-          userIds: [username]
+      if (username !== req.session.username) {
+        const noteShare = await NoteShare.findOne({
+          where: {
+            noteId: id
+          }
         })
-        newNoteShare.setNote(note)
+        if (noteShare) {
+          noteShare.setDataValue('userIds', noteShare.getDataValue('userIds').concat([username]))
+        } else {
+          const newNoteShare = await NoteShare.create({
+            userIds: [username]
+          })
+          newNoteShare.setNote(note)
+        }
       }
       return res.json({ status: 1, mes: 'Share note success' })
     } catch (e) {

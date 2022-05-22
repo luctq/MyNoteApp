@@ -38,7 +38,8 @@ function RecycleBin({
 
   const handleRestoreNote = (note) => {
     // kiểm tra folder chứa nó bị xóa chưa, nếu rồi thì khôi phục folder đó
-    if (folderList[note.folderId].isDeleted) {
+    const folder = folderList.filter(folder => folder.id === note.folderId)[0]
+    if (folder.isDeleted) {
       restoreFolder(note.folderId);
     }
     //khôi phục note

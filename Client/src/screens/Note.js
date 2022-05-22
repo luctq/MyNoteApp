@@ -40,6 +40,9 @@ import {
 } from "../redux/reducers/Note";
 import ChangeBackgroundModal from '../components/ChangeBackgroundModal'
 import { light, dark, yellow, pink } from '../themes/themes'
+import {
+  shareData
+} from '../redux/reducers/Auth'
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -53,19 +56,20 @@ const mapActionToProps = {
   createNewNote,
   updateNote,
   expulsionNote,
-  deleteNote
+  deleteNote,
+  shareData
 };
 
-function Note({ navigation, route, createNewNote, updateNote, expulsionNote, deleteNote, noteList }) {
+function Note({ navigation, route, createNewNote, updateNote, expulsionNote, deleteNote, noteList, shareData }) {
   const listTheme = {"light": light, "yellow": yellow, "dark": dark, "pink": pink}
   const note = route.params.item;
-  const theme = listTheme[noteList[note.id].theme];
+  const theme = listTheme[noteList.filter(n => n.id === note.id)[0].theme];
   const isNew = route.params.isNew;
   const folderName = route.params.folderName;
   const [isOpen, setIsOpen] = useState(false);
   const [proFocus, setProFocus] = useState({
     height: screen.height - 96.5,
-    isDisableButton: note.isNoteShare ? true : false
+    isDisableButton: false
   });
   const [noteTitle, setNoteTitle] = useState(note.title);
   const [noteContent, setNoteContent] = useState(note.content);
@@ -120,15 +124,14 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
       await recording.stopAndUnloadAsync()
     }
     if (!isNew) {
-      if (noteContent === "" && noteTitle === "") expulsionNote(note.id);
+      if (noteContent === "" && noteTitle === "") expulsionNote(note);
       else updateNote({ ...note, title: noteTitle, content: noteContent });
     } else {
-      if (noteContent === "" && noteTitle === "") expulsionNote(note.id);
+      if (noteContent === "" && noteTitle === "") expulsionNote(note);
       else if (noteTitle !== "" || noteContent !== "") {
         updateNote({ ...note, title: noteTitle, content: noteContent });
       }
     }
-    
     navigation.goBack();
   };
   const handlePressAddImage = useCallback(async () => {
@@ -249,6 +252,9 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
       isDisableButton: false
     })
   }
+  const handleShareData = (username) => {
+    shareData(note.id, username)
+  }
 
   return (
     <View style={styles.container(theme)}>
@@ -263,25 +269,32 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
         isOpen={isOpenDropDown}
         setIsOpen={() => handlePressFolderIcon()}
       />
-      <ShareFormModal isOpen={isOpen} isClosed={() => setIsOpen(false)} />
+      <ShareFormModal 
+        isOpen={isOpen} 
+        isClosed={() => setIsOpen(false)}
+        handleShareData={handleShareData}
+      />
       <View style={styles.headerIcon(theme)}>
         <ShareButton
           iconColor={theme.text}
           style={styles.shareButton(theme)}
           handlePress={() => setIsOpen(!isOpen)}
           isDisable={proFocus.isDisableButton}
+          isHide={note.isNoteShare ? true : false}
         />
         <ChangeBackgroundButton
           iconColor={theme.text}
           style={styles.changeBackgroundButton(theme)}
           onButtonChangeBackground={handlePressChangeBackgroundIcon}
           isDisable={proFocus.isDisableButton}
+          isHide={note.isNoteShare ? true : false}
         />
         <ThreeDotButton
           iconColor={theme.text}
           style={styles.threeDotButton(theme)}
           onButtonPress={handlePressFolderIcon}
           isDisable={proFocus.isDisableButton}
+          isHide={note.isNoteShare ? true : false}
         />
         <CompleteButton
           onButtonPress={handlePressComplete}
@@ -290,6 +303,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
             backgroundColor: theme.background,
             color: theme.text,
           }}
+          isHide={note.isNoteShare ? true : false}
         />
       </View>
       <TextInput
@@ -435,7 +449,8 @@ const styles = StyleSheet.create({
   }),
   richEditor: {
     // borderColor: 'green',
-    // borderWidth: 1
+    // borderWidth: 1,
+    // height: '100%'
   },
   folderName: theme => ({
     backgroundColor: theme.background,

@@ -1,9 +1,9 @@
 import { TouchableOpacity, StyleSheet, View, Text } from "react-native";
 
-function CompleteButton({ style, onButtonPress }) {
+function CompleteButton({ style, onButtonPress, isHide }) {
 
   return (
-    <View style={style}>
+    <View style={[style, { display: isHide ? 'none' : 'flex' }]}>
       <TouchableOpacity 
         style={styles.container} 
         onPress={onButtonPress}

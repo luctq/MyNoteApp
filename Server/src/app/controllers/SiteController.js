@@ -12,6 +12,7 @@ class SiteController {
 
   async register(req, res) {
     try {
+      await User.sync()
       const { username, password } = req.body
       const result = await validationUsername(username, 'register')
       if (result.status === 0) {
@@ -35,6 +36,7 @@ class SiteController {
 
   async login(req, res) {
     try {
+      await User.sync()
       const { username, password } = req.body
       var user = null
       const result = await validationUsername(username, 'login')

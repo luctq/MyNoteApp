@@ -30,7 +30,8 @@ function NewFolderModal(props) {
   const inputRef = useRef();
 
   function handleCreateFolder() {
-    props.createNewFolder({ id: props.folderList.length, name: folderName });
+    const nextId = props.folderList.length === 0 ? 0 : props.folderList[props.folderList.length - 1].id + 1
+    props.createNewFolder({ id: nextId, name: folderName, noteCount: 0, isDeleted: false, deleteTime: null });
     ref.current.close();
   }
 

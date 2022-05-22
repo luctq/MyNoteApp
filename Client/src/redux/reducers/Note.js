@@ -16,19 +16,7 @@ const note = createSlice({
   reducers: {
     // các actions
     addNote(state, action) {
-      var lastId = 0;
-      if (state.noteList.length !== 0)
-        lastId = state.noteList[state.noteList.length - 1].id + 1;
-      const newNote = {
-        id: lastId,
-        folderId: action.payload.folderId,
-        title: action.payload.title,
-        content: action.payload.content,
-        lastEdit: moment().format("YYYYMMDDHHmmss"),
-        isDeleted: false,
-        theme: "light"
-      };
-      state.noteList.push(newNote);
+      state.noteList.push(action.payload);
     },
     deleteNoteById(state, action) {
       state.noteList = state.noteList.filter((note, index) => {
@@ -82,6 +70,9 @@ const note = createSlice({
     },
     setNoteList(state, action) {
       state.noteList = action.payload.notes
+    },
+    resetNoteList(state, action) {
+      state.noteList = []
     }
   },
 });
@@ -94,24 +85,69 @@ export const {
   deleteNoteInFolderById,
   expulsionNoteById,
   changeThemeScreen,
-  setNoteList
+  setNoteList,
+  resetNoteList
 } = note.actions;
 
 export const changeTheme = (id, theme) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/sync/changeTheme', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id, theme})
+  })
+  .then(res => res.json())
+  .then(result => {
+    console.log(result.mes)
+  })
   dispatch(changeThemeScreen({id: id, theme: theme}));
 };
 
 export const createNewNote = (info) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/sync/createNewNote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({note: info})
+  })
+  .then(res => res.json())
+  .then(result => {
+    console.log(result.mes)
+  })
   dispatch(addNote(info));
   dispatch(incNoteCountById(info.folderId));
 };
 
 export const deleteNote = (note) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/sync/deleteNote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id: note.id})
+  })
+  .then(res => res.json())
+  .then(result => {
+    console.log(result.mes)
+  })
   dispatch(deleteNoteById(note.id));
   dispatch(decNoteCountById(note.folderId));
 };
 
 export const restoreNote = (note) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/sync/restoreNote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id: note.id})
+  })
+  .then(res => res.json())
+  .then(result => {
+    console.log(result.mes)
+  })
   dispatch(restoreNoteById(note.id));
   dispatch(incNoteCountById(note.folderId));
 };
@@ -121,11 +157,34 @@ export const deleteNoteInFolder = (folderId) => (dispatch) => {
 };
 
 export const updateNote = (note) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/sync/updateNote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({note})
+  })
+  .then(res => res.json())
+  .then(result => {
+    console.log(result.mes)
+  })
   dispatch(editNote(note));
 };
 
-export const expulsionNote = (id) => (dispatch) => {
-  dispatch(expulsionNoteById(id));
+export const expulsionNote = (note) => (dispatch) => {
+  fetch('http://192.168.113.107:8080/sync/expulsionNote', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id: note.id})
+  })
+  .then(res => res.json())
+  .then(result => {
+    console.log(result.mes)
+  })
+  dispatch(expulsionNoteById(note.id));
+  dispatch(decNoteCountById(note.folderId));
 };
 
 export default note.reducer;

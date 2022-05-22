@@ -1,10 +1,10 @@
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import EntypoIcons from 'react-native-vector-icons/Entypo'
 
-function ThreeDotButton({ style, onButtonPress, isDisable, iconColor }) {
+function ThreeDotButton({ style, onButtonPress, isDisable, iconColor, isHide }) {
 
   return (
-    <View style={style}>
+    <View style={[style, { display: isHide ? 'none' : 'flex' }]}>
       <TouchableOpacity 
         style={styles.container(isDisable)}
         onPress={onButtonPress}
