@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { setFolderList, resetFolderList } from "./Folder";
 import { setNoteList, resetNoteList } from "./Note";
+import { serverApi } from "../serverApi";
 
 const initialState = {
   isLogin: false,
@@ -68,7 +69,7 @@ const auth = createSlice({
 const { loginComplete, logoutComplete , registerComplete, resetStatusComplete, uploadDataComplete, downloadDataComplete} = auth.actions;
 
 export const login = (username, password) => async (dispatch) => {
-  fetch('http://192.168.113.107:8080/login', {
+  fetch(`${serverApi}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -82,7 +83,7 @@ export const login = (username, password) => async (dispatch) => {
 }
 
 export const register = (username, password) => async (dispatch) => {
-  fetch('http://192.168.113.107:8080/register', {
+  fetch(`${serverApi}/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -96,7 +97,7 @@ export const register = (username, password) => async (dispatch) => {
 }
 
 export const logout = () => (dispatch) => {
-  fetch('http://192.168.113.107:8080/logout', {
+  fetch(`${serverApi}/logout`, {
     method: 'GET',
   })
   .then(res => res.json())
@@ -108,7 +109,7 @@ export const logout = () => (dispatch) => {
 }
 
 export const uploadData = (folders, notes) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/uploadData', {
+  fetch(`${serverApi}/sync/uploadData`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -122,7 +123,7 @@ export const uploadData = (folders, notes) => (dispatch) => {
 }
 
 export const downloadData = () => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/downloadData', {
+  fetch(`${serverApi}/sync/downloadData`, {
     method: 'GET',
   })
   .then(res => res.json())
@@ -136,7 +137,7 @@ export const downloadData = () => (dispatch) => {
 }
 
 export const shareData = (id, username) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/share/shareNote', {
+  fetch(`${serverApi}/share/shareNote`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

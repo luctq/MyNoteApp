@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { serverApi } from "../serverApi";
 
 const initialState = {
   folderList: [],
@@ -71,7 +72,7 @@ export const {
 } = folder.actions;
 
 export const createNewFolder = (info) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/createNewFolder', {
+  fetch(`${serverApi}/sync/createNewFolder`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -86,7 +87,7 @@ export const createNewFolder = (info) => (dispatch) => {
 };
 
 export const deleteFolder = (id) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/deleteFolder', {
+  fetch(`${serverApi}/sync/deleteFolder`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

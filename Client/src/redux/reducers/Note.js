@@ -3,6 +3,7 @@ import { incNoteCountById, decNoteCountById } from "./Folder";
 import { dark, light, pink, yellow } from "../../themes/themes";
 import moment from "moment";
 import "moment/locale/vi";
+import { serverApi } from "../serverApi"
 
 moment.locale("vi");
 const initialState = {
@@ -90,7 +91,7 @@ export const {
 } = note.actions;
 
 export const changeTheme = (id, theme) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/changeTheme', {
+  fetch(`${serverApi}/sync/changeTheme`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -105,7 +106,7 @@ export const changeTheme = (id, theme) => (dispatch) => {
 };
 
 export const createNewNote = (info) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/createNewNote', {
+  fetch(`${serverApi}/sync/createNewNote`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -121,7 +122,7 @@ export const createNewNote = (info) => (dispatch) => {
 };
 
 export const deleteNote = (note) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/deleteNote', {
+  fetch(`${serverApi}/sync/deleteNote`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -137,7 +138,7 @@ export const deleteNote = (note) => (dispatch) => {
 };
 
 export const restoreNote = (note) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/restoreNote', {
+  fetch(`${serverApi}/sync/restoreNote`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -157,7 +158,7 @@ export const deleteNoteInFolder = (folderId) => (dispatch) => {
 };
 
 export const updateNote = (note) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/updateNote', {
+  fetch(`${serverApi}/sync/updateNote`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -172,7 +173,7 @@ export const updateNote = (note) => (dispatch) => {
 };
 
 export const expulsionNote = (note) => (dispatch) => {
-  fetch('http://192.168.113.107:8080/sync/expulsionNote', {
+  fetch(`${serverApi}/sync/expulsionNote`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
