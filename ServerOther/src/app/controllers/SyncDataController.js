@@ -25,6 +25,7 @@ class SyncDataController {
       for (const folder of folders) {
         await Note.sync()
         const newFolder = await Folder.create({
+          id: folder.id,
           name: folder.name,
           noteCount: folder.noteCount,
           deleteTime: folder.deleteTime,
@@ -63,6 +64,7 @@ class SyncDataController {
             }
           }
           const newNote = await Note.create({
+            id: note.id,
             title: note.title,
             content: note.content,
             lastEdit: note.lastEdit,
@@ -153,8 +155,6 @@ class SyncDataController {
   async createNewNote(req, res) {
     const { note } = req.body
     try {
-      //bug
-      console.log(note)
       const folder = await Folder.findOne({
         where: {
           id: note.folderId
