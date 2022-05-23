@@ -70,7 +70,7 @@ function DropDownOfSync(props) {
     if (isOpenModal) {
       return (
         <LoadingModal
-          isOpen={props.isCloseLoading ? false : isOpenModal}
+          isOpen={props.isStopLoading ? false : isOpenModal }
           onClosed={() => setIsOpenModal(false)}
         />
       );

@@ -14,28 +14,33 @@ import FlashMessage from 'react-native-flash-message'
 
 import BackButton from "../components/BackButton";
 import DropDownOfSync from "../components/DropDownOfSync";
-import { logout, resetStatus, uploadData, downloadData } from '../redux/reducers/Auth'
+import { logout, uploadData, downloadData, resetMes } from '../redux/reducers/Auth'
 
-function Settings({ navigation, auth, logout, resetStatus, uploadData, downloadData, folders, notes }) {
+function Settings({ navigation, auth, logout, uploadData, downloadData, folders, notes, resetMes }) {
   const [isOpenDropDown, setIsOpenDropDown] = useState(false)
 
   const settingRefMes = React.useRef()
 
   React.useEffect(() => {
-    if (auth.status === 0) {
-      settingRefMes.current.showMessage({
-        message: auth.mes,
-        type: 'danger',
-        duration: 2000
-      })
+    if (auth.mes.type === 'uploadData' || auth.mes.type === 'downloadData') {
+      if (auth.mes.status === 1) {
+        settingRefMes.current.showMessage({
+          message: auth.mes.content,
+          type: 'success',
+          duration: 500
+        })
+        resetMes()
+      }
+      if (auth.mes.status === 0) {
+        settingRefMes.current.showMessage({
+          message: auth.mes.content,
+          type: 'danger',
+          duration: 500
+        })
+        resetMes()
+      }
     }
-  }, [auth.status, auth.randomNumber])
-
-  React.useEffect(() => {
-    return () => {
-      resetStatus()
-    }
-  }, [])
+  }, [auth.mes.status])
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -44,7 +49,6 @@ function Settings({ navigation, auth, logout, resetStatus, uploadData, downloadD
     if (auth.isLogin) {
       handleToggleDropDown()
     } else {
-      resetStatus()
       navigation.navigate("Login");
     }
   }
@@ -55,11 +59,9 @@ function Settings({ navigation, auth, logout, resetStatus, uploadData, downloadD
     logout()
   }
   const handleUploadData = () => {
-    resetStatus()
     uploadData(folders, notes)
   }
   const handleDownloadData = () => {
-    resetStatus()
     downloadData()
   }
 
@@ -72,7 +74,7 @@ function Settings({ navigation, auth, logout, resetStatus, uploadData, downloadD
         onLogoutPress={handleLogout} 
         onUploadPress={handleUploadData}
         onDownloadPress={handleDownloadData}
-        isCloseLoading={auth.status === 1 ? true : false}
+        isStopLoading={auth.mes.status !== null ? true : false}
       />
       <Text style={styles.header}>Ghi chú</Text>
       <View>
@@ -204,9 +206,9 @@ const mapStateToProps = state => ({
 
 const mapActionToProps = {
   logout,
-  resetStatus,
   uploadData,
-  downloadData
+  downloadData,
+  resetMes
 }
 
 export default connect(mapStateToProps, mapActionToProps)(Settings)

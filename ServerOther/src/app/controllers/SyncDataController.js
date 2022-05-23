@@ -51,7 +51,7 @@ class SyncDataController {
               const regex1 = /data:image\/png;base64,([+:/=;,A-Za-z\s0-9]+)/
               fs.writeFile(`./public/images/${note.lastEdit}${i}.png`, r.data, 'base64', (err) => {
                 if (err) return console.error(err);
-                console.log('File saved')
+                console.log('Ảnh đã được lưu thành công')
               })
               note.content = note.content.replace(regex1, `http://192.168.113.107:8080/images/${note.lastEdit}${i}.png`)
             }
@@ -59,7 +59,7 @@ class SyncDataController {
               const regex1 = /data:audio\/mp4;base64,([+:/=;,A-Za-z\s0-9]+)/
               fs.writeFile(`./public/audios/${note.lastEdit}${i}.mp4`, r.data, 'base64', (err) => {
                 if (err) return console.error(err);
-                console.log('File saved')
+                console.log('Ảnh đã được lưu thành công')
               })
               note.content = note.content.replace(regex1, `http://192.168.113.107:8080/audios/${note.lastEdit}${i}.mp4`)
             }
@@ -77,10 +77,10 @@ class SyncDataController {
         user.addFolders(newFolder)
       }
       await new Promise(resolve => setTimeout(resolve, 2000))
-      return res.json({ status: 1, mes: 'Sync data success' })
+      return res.json({ status: 1, mes: 'Tải dữ liệu lên cloud thành công' })
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -116,10 +116,10 @@ class SyncDataController {
       }
       notes = notes.concat(result)
       await new Promise(resolve => setTimeout(resolve, 2000))
-      return res.json({ status: 1, mes: 'Download data success', data: {folders, notes} })
+      return res.json({ status: 1, mes: 'Lấy dữ liệu từ cloud thành công', data: {folders, notes} })
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -145,13 +145,13 @@ class SyncDataController {
             id
           }
         })
-        return res.json({ status: 1, mes: 'Change theme success' })
+        return res.json({ status: 1, mes: 'Thay đổi nền thành công' })
       } else {
-        return res.json({ status: 0, mes: 'Access denied' })
+        return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
       }
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -186,7 +186,7 @@ class SyncDataController {
       }
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -224,7 +224,7 @@ class SyncDataController {
       }
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -273,7 +273,7 @@ class SyncDataController {
       }
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -309,7 +309,7 @@ class SyncDataController {
       }
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -368,7 +368,7 @@ class SyncDataController {
       }
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -391,7 +391,7 @@ class SyncDataController {
       return res.json({ status: 1, mes: 'Create new folder success', id: newFolder.id })
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 
@@ -435,7 +435,7 @@ class SyncDataController {
       }
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 }

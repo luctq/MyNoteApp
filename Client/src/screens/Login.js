@@ -8,6 +8,8 @@ import {
   TextInput,
   Dimensions,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import Constants from 'expo-constants'
 import { connect } from 'react-redux'
@@ -17,37 +19,40 @@ import BackButton from "../components/BackButton";
 import {
   login,
   logout,
-  resetStatus
+  resetMes
 } from '../redux/reducers/Auth.js'
 
 var screen = Dimensions.get("window");
 
-function Login({ login, navigation, auth, resetStatus }) {
+function Login({ login, navigation, auth, resetMes }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const loginRefMes = React.useRef()
 
   React.useEffect(() => {
-    if (auth.status === 1) {
-      setTimeout(() => {
-        navigation.goBack()
-      }, 1000)
-    } 
-    if (auth.status === 0) {
-      loginRefMes.current.showMessage({
-        message: auth.mes,
-        type: 'danger',
-        duration: 2000
-      })
+    if (auth.mes.type === 'login') {
+      if (auth.mes.status === 1) {
+        loginRefMes.current.showMessage({
+          message: auth.mes.content,
+          type: 'success',
+          duration: 500
+        })
+        resetMes()
+        setTimeout(() => {
+          navigation.goBack()
+        }, 600)
+      }
+      if (auth.mes.status === 0) {
+        loginRefMes.current.showMessage({
+          message: auth.mes.content,
+          type: 'danger',
+          duration: 500
+        })
+        resetMes()
+      }
     }
-  }, [auth.status, auth.randomNumber])
-
-  React.useEffect(() => {
-    return () => {
-      resetStatus()
-    }
-  }, [])
+  }, [auth.mes.status])
 
   const handleLogin = () => {
     login(username, password)
@@ -57,15 +62,13 @@ function Login({ login, navigation, auth, resetStatus }) {
     navigation.goBack()
   }
   const handleRegisterPress = () => {
-    resetStatus()
     navigation.navigate('Register')
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
       <Image style={styles.image} source={require("../../assets/logo.png")} />
-
       <StatusBar style="auto" />
       <Text style={styles.title}>Welcome Back</Text>
       <View style={styles.inputView}>
@@ -110,7 +113,7 @@ function Login({ login, navigation, auth, resetStatus }) {
         </TouchableOpacity>
       </View>
       <FlashMessage position='top' ref={loginRefMes} />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -175,7 +178,7 @@ const mapStateToProps = state => ({
 const mapActionToProps = {
   login,
   logout,
-  resetStatus
+  resetMes
 }
 
 export default connect(mapStateToProps, mapActionToProps)(Login)

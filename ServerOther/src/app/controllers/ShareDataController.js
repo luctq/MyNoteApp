@@ -15,9 +15,9 @@ class ShareDataController {
       })
       const result = await validationUsername(username)
       if (result.status === 0) {
-        return res.json({ status: 0, mes: 'This account is invalid' })
+        return res.json({ status: 0, mes: 'Tài khoản không hợp lệ' })
       } else if (result.status === -1) {
-        return res.json({ status: 0, mes: 'An error has occurred in the system' })
+        return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
       }
       if (username !== req.session.username) {
         const noteShare = await NoteShare.findOne({
@@ -33,13 +33,13 @@ class ShareDataController {
           })
           newNoteShare.setNote(note)
         }
-        return res.json({ status: 1, mes: 'Share note success' })
+        return res.json({ status: 1, mes: 'Chia sẽ ghi chú thành công' })
       } else {
-        return res.json({ status: 0, mes: 'Can not share your self' })
+        return res.json({ status: 0, mes: 'Không thể chia sẻ cho chính mình' })
       }
     } catch (e) {
       console.log(e)
-      return res.json({ status: 0, mes: 'An error has occurred in the system' })
+      return res.json({ status: 0, mes: 'Có lỗi nào đó trong hệ thống' })
     }
   }
 }

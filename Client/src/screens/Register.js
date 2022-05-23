@@ -17,12 +17,12 @@ import FlashMessage from 'react-native-flash-message'
 import { connect } from 'react-redux'
 
 import BackButton from "../components/BackButton";
-import { resetStatus, register } from '../redux/reducers/Auth'
+import { resetMes, register } from '../redux/reducers/Auth'
 
 var screen = Dimensions.get("window");
 
 
-function Register({ navigation, auth, resetStatus, register }) {
+function Register({ navigation, auth, resetMes, register }) {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -37,9 +37,9 @@ function Register({ navigation, auth, resetStatus, register }) {
   const handleRegisterPress = () => {
     if (confirmPassword !== password) {
       registerRefMes.current.showMessage({
-        message: 'The password and confirm password are not the same',
+        message: 'Mật khẩu và xác nhận mật khẩu không trùng khớp',
         type: 'warning',
-        duration: 2000
+        duration: 500
       })
     } else {
       register(username, password)
@@ -47,33 +47,35 @@ function Register({ navigation, auth, resetStatus, register }) {
   }
 
   React.useEffect(() => {
-    if (auth.status === 1) {
-      registerRefMes.current.showMessage({
-        message: auth.mes,
-        type: 'success',
-        duration: 2000
-      })
-      setTimeout(() => {
-        navigation.goBack()
-      }, 2000)
-    } 
-    if (auth.status === 0) {
-      registerRefMes.current.showMessage({
-        message: auth.mes,
-        type: 'danger',
-        duration: 2000,
-      })
+    if (auth.mes.type === 'register') {
+      if (auth.mes.status === 1) {
+        registerRefMes.current.showMessage({
+          message: auth.mes.content,
+          type: 'success',
+          duration: 500
+        })
+        resetMes()
+        setTimeout(() => {
+          navigation.goBack()
+        }, 600)
+      }
+      if (auth.mes.status === 0) {
+        registerRefMes.current.showMessage({
+          message: auth.mes.content,
+          type: 'danger',
+          duration: 1000,
+        })
+        resetMes()
+      }
     }
-  }, [auth.status, auth.randomNumber])
-
-  React.useEffect(() => {
-    return () => {
-      resetStatus()
-    }
-  }, [])
+  }, [auth.mes.status])
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+    >
       <BackButton style={styles.backButton} onBackPress={handleBackPress}/>
       <Image style={styles.image} source={require("../../assets/logo.png")} />
 
@@ -178,7 +180,7 @@ const mapStateToProps = state => ({
 })
 
 const mapActionToProps = {
-  resetStatus,
+  resetMes,
   register
 }
 

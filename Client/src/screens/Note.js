@@ -9,6 +9,7 @@ import {
   LogBox,
   TouchableOpacity,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native'
 import {
   actions,
@@ -51,6 +52,7 @@ LogBox.ignoreLogs([
 const screen = Dimensions.get('window')
 const mapStateToProps = (state) => ({
   noteList: state.note.noteList,
+  isLogin: state.auth.isLogin
 });
 const mapActionToProps = {
   createNewNote,
@@ -60,7 +62,7 @@ const mapActionToProps = {
   shareData
 };
 
-function Note({ navigation, route, createNewNote, updateNote, expulsionNote, deleteNote, noteList, shareData }) {
+function Note({ navigation, route, updateNote, expulsionNote, noteList, shareData, isLogin }) {
   const listTheme = {"light": light, "yellow": yellow, "dark": dark, "pink": pink}
   const note = route.params.item;
   const theme = listTheme[noteList.filter(n => n.id === note.id)[0].theme];
@@ -69,7 +71,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
   const [isOpen, setIsOpen] = useState(false);
   const [proFocus, setProFocus] = useState({
     height: screen.height - 96.5,
-    isDisableButton: false
+    isFocus: false
   });
   const [noteTitle, setNoteTitle] = useState(note.title);
   const [noteContent, setNoteContent] = useState(note.content);
@@ -100,10 +102,15 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
     setIsOpenModalChangeBackground(!isOpenModalChangeBackground)
   };
   const handlePressComplete = async () => {
+    setProFocus({
+      height: screen.height - 96.5,
+      isFocus: false
+    })
     if (recording) {
       setRecording(undefined)
       await recording.stopAndUnloadAsync()
     }
+    updateNote({ ...note, title: noteTitle, content: noteContent })
     richText.current.dismissKeyboard()
   }
   const handlePressDraw = () => {
@@ -123,15 +130,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
     if (recording) {
       await recording.stopAndUnloadAsync()
     }
-    if (!isNew) {
-      if (noteContent === "" && noteTitle === "") expulsionNote(note);
-      else updateNote({ ...note, title: noteTitle, content: noteContent });
-    } else {
-      if (noteContent === "" && noteTitle === "") expulsionNote(note);
-      else if (noteTitle !== "" || noteContent !== "") {
-        updateNote({ ...note, title: noteTitle, content: noteContent });
-      }
-    }
+    if (noteContent === "" && noteTitle === "") expulsionNote(note)
     navigation.goBack();
   };
   const handlePressAddImage = useCallback(async () => {
@@ -243,13 +242,13 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
   const handleEditorFocus = () => {
     setProFocus({
       height: screen.height - 96.5 - keyboardHeight - 44,
-      isDisableButton: true
+      isFocus: true
     })
   }
-  const handleEditorBlur = async () => {
+  const handleTitleFocus = () => {
     setProFocus({
       height: screen.height - 96.5,
-      isDisableButton: false
+      isFocus: true
     })
   }
   const handleShareData = (username) => {
@@ -259,9 +258,18 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
   return (
     <View style={styles.container(theme)}>
       <View style={styles.backButton(theme)}>
-        <BackButton iconColor={theme.text} onBackPress={handleBackPress} />
-        <TouchableOpacity onPress={handleBackPress}>
-          <Text style={styles.folderName(theme)}>{folderName}</Text>
+        <BackButton 
+          iconColor={theme.text} 
+          onBackPress={handleBackPress} 
+          isDisable={proFocus.isFocus}
+        />
+        <TouchableOpacity 
+          onPress={handleBackPress}
+          disabled={proFocus.isFocus}
+        >
+          <Text 
+            style={[styles.folderName(theme), { color: proFocus.isFocus ? '#ddd' : '#000' }]}
+          >{folderName}</Text>
         </TouchableOpacity>
       </View>
       <ChangeBackgroundModal noteId = {note.id} isOpen={isOpenModalChangeBackground} onClosed={() => setIsOpenModalChangeBackground(false)}/>
@@ -279,27 +287,27 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
           iconColor={theme.text}
           style={styles.shareButton(theme)}
           handlePress={() => setIsOpen(!isOpen)}
-          isDisable={proFocus.isDisableButton}
-          isHide={note.isNoteShare ? true : false}
+          isDisable={proFocus.isFocus}
+          isHide={note.isNoteShare || !isLogin ? true : false}
         />
         <ChangeBackgroundButton
           iconColor={theme.text}
           style={styles.changeBackgroundButton(theme)}
           onButtonChangeBackground={handlePressChangeBackgroundIcon}
-          isDisable={proFocus.isDisableButton}
+          isDisable={proFocus.isFocus}
           isHide={note.isNoteShare ? true : false}
         />
         <ThreeDotButton
           iconColor={theme.text}
           style={styles.threeDotButton(theme)}
           onButtonPress={handlePressFolderIcon}
-          isDisable={proFocus.isDisableButton}
+          isDisable={proFocus.isFocus}
           isHide={note.isNoteShare ? true : false}
         />
         <CompleteButton
           onButtonPress={handlePressComplete}
           style={{
-            display: proFocus.isDisableButton === false ? 'none' : 'flex',  
+            display: proFocus.isFocus === false ? 'none' : 'flex',  
             backgroundColor: theme.background,
             color: theme.text,
           }}
@@ -313,8 +321,32 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
         onChangeText={handleNoteTitleChange}
         style={styles.titleNote(theme)}
         editable={note.isNoteShare ? false : true}
+        onFocus={handleTitleFocus}
       />
       <View>
+        <ScrollView
+          style={[styles.editorView(theme), { height: proFocus.height }]}
+          ref={editorView}
+          onContentSizeChange={() =>
+            editorView.current.scrollToEnd({ animated: true })
+          }
+        >
+          <RichEditor
+            ref={richText}
+            initialContentHTML={noteContent}
+            onChange={(text) => {
+              handleNoteContentChange(text);
+            }}
+            editorStyle={{ backgroundColor: theme.background, color: theme.text, }}
+            placeholder="Gõ nội dung..."
+            placeholderTextColor={theme.text}
+            style={styles.richEditor}
+            onFocus={handleEditorFocus}
+            disabled={note.isNoteShare ? true : false}
+          />
+        </ScrollView>
+      </View>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <RichToolbar
           iconTint={theme.text}
           editor={richText}
@@ -346,7 +378,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
               <Ionicons name='close' size={25} color={tintColor} />
             )
           }}
-          style={[styles.richToolBar(theme), { bottom: Platform.OS === 'ios' ? -44 : 0 }]}
+          style={[styles.richToolBar(theme)]}
           onPressAddImage={handlePressAddImage}
           insertVoice={recording ? handleStopRecording : handleInsertVoice}
           launchCamera={handleLaunchCamera}
@@ -354,29 +386,7 @@ function Note({ navigation, route, createNewNote, updateNote, expulsionNote, del
           editText={handlePressEditText}
           close={handleCloseTextTool}
         />
-        <ScrollView
-          style={[styles.editorView(theme), { height: proFocus.height }]}
-          ref={editorView}
-          onContentSizeChange={() =>
-            editorView.current.scrollToEnd({ animated: true })
-          }
-        >
-          <RichEditor
-            ref={richText}
-            initialContentHTML={noteContent}
-            onChange={(text) => {
-              handleNoteContentChange(text);
-            }}
-            editorStyle={{ backgroundColor: theme.background, color: theme.text, }}
-            placeholder="Gõ nội dung..."
-            placeholderTextColor={theme.text}
-            style={styles.richEditor}
-            onFocus={handleEditorFocus}
-            onBlur={handleEditorBlur}
-            disabled={note.isNoteShare ? true : false}
-          />
-        </ScrollView>
-      </View>
+      </KeyboardAvoidingView>
       <FlashMessage position='top' />
     </View>
   );
