@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, Text, StyleSheet, TextInput } from "react-native";
 import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
 import Constants from "expo-constants";
 import { connect } from "react-redux";
@@ -10,7 +10,14 @@ import NoteListItem from "../components/NoteListItem";
 import AddNewNoteButton from "../components/AddNewNoteButton";
 import DeleteButton from "../components/DeleteButton";
 import BackButton from "../components/BackButton";
-import { deleteNote, createNewNote, expulsionNote } from "../redux/reducers/Note";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import {
+  deleteNote,
+  createNewNote,
+  expulsionNote,
+} from "../redux/reducers/Note";
+
+import { renameFolder } from "../redux/reducers/Folder";
 import { makeId } from "../redux/reducers/Todo";
 
 const mapStateToProps = (state) => ({
@@ -20,25 +27,36 @@ const mapStateToProps = (state) => ({
 const mapActionToProps = {
   deleteNote,
   createNewNote,
-  expulsionNote
+  expulsionNote,
+  renameFolder,
 };
 
-function Folder({ navigation, noteList, route, deleteNote, createNewNote, expulsionNote }) {
+function Folder({
+  navigation,
+  noteList,
+  route,
+  deleteNote,
+  createNewNote,
+  expulsionNote,
+  renameFolder,
+}) {
   const id = route.params.id;
-  const name = route.params.name;
   const isFolderShare = route.params.isFolderShare;
   const [textSearch, setTextSearch] = useState("");
+  const [name, setName] = useState(route.params.name);
+  const [onPressEditName, setOnPressEditName] = useState(false);
+  const textInputRef = useRef();
 
   const noteListInFolder = noteList.filter((note, index) => {
     return note.folderId === id;
   });
   const handleDeleteNote = (item) => {
     if (item.isNoteShare) {
-      expulsionNote(item)
+      expulsionNote(item);
     } else {
-      deleteNote(item)
+      deleteNote(item);
     }
-  }
+  };
   const renderItem = (data, rowMap) => {
     if (
       !data.item.isDeleted &&
@@ -70,7 +88,7 @@ function Folder({ navigation, noteList, route, deleteNote, createNewNote, expuls
     navigation.goBack();
   };
   const handleNoteListItemPress = (item) => {
-    navigation.navigate("Note", { item, isNew: false, folderName: name, });
+    navigation.navigate("Note", { item, isNew: false, folderName: name });
   };
   const handleAddNewNotePress = async () => {
     // const nextId = noteList.length === 0 ? 0 : noteList[noteList.length - 1].id + 1
@@ -82,9 +100,9 @@ function Folder({ navigation, noteList, route, deleteNote, createNewNote, expuls
       lastEdit: moment().format("YYYYMMDDHHmmss"),
       isDeleted: false,
       deleteTime: null,
-      theme: "light"
-    }
-    await createNewNote(newNote)
+      theme: "light",
+    };
+    await createNewNote(newNote);
     navigation.navigate("Note", {
       item: newNote,
       isNew: true,
@@ -92,10 +110,31 @@ function Folder({ navigation, noteList, route, deleteNote, createNewNote, expuls
     });
   };
 
+  function handleRenameFolder() {
+    if (onPressEditName) renameFolder(id, name);
+    // else textInputRef.current.focus();
+    setOnPressEditName(!onPressEditName);
+  }
+
   return (
     <View style={styles.container}>
       <BackButton style={styles.backButton} onBackPress={handleBackPress} />
-      <Text style={styles.header}>{name}</Text>
+      <View style={styles.header}>
+        <AntDesign
+          name={onPressEditName ? "check" : "edit"}
+          size={25}
+          style={styles.iconEdit}
+          onPress={() => handleRenameFolder()}
+        />
+        <TextInput
+          value={name}
+          style={styles.folderName}
+          onChangeText={(text) => setName(text)}
+          ref={textInputRef}
+          editable={onPressEditName}
+        />
+      </View>
+
       <SearchBar
         style={styles.searchBar}
         textSearch={textSearch}
@@ -120,11 +159,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f7f7f7",
     flex: 1,
     paddingHorizontal: 25,
-  },
-  header: {
-    fontSize: 35,
-    fontWeight: "400",
-    marginTop: Constants.statusBarHeight + 50,
   },
   note: {
     fontSize: 15,
@@ -159,6 +193,20 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: Constants.statusBarHeight + 5,
     left: 6,
+  },
+  header: {
+    flexDirection: "row",
+    marginLeft: 5,
+  },
+  iconEdit: {
+    flex: 1,
+    marginTop: Constants.statusBarHeight + 50 + 13,
+  },
+  folderName: {
+    fontSize: 35,
+    fontWeight: "400",
+    marginTop: Constants.statusBarHeight + 50,
+    flex: 7,
   },
 });
 

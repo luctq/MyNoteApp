@@ -51,17 +51,27 @@ const folder = createSlice({
       });
     },
     setFolderList(state, action) {
-      state.folderList = action.payload.folders
-      state.folderCount = action.payload.folders.length
+      state.folderList = action.payload.folders;
+      state.folderCount = action.payload.folders.length;
     },
     resetFolderList(state, action) {
-      state.folderList = []
-      state.folderCount = 0
+      state.folderList = [];
+      state.folderCount = 0;
     },
     expulsionFolderById(state, action) {
-      state.folderList = state.folderList.filter(folder => folder.id !== action.payload);
+      state.folderList = state.folderList.filter(
+        (folder) => folder.id !== action.payload
+      );
       state.folderCount--;
-    }
+    },
+    editName(state, action) {
+      state.folderList = state.folderList.filter((folder, index) => {
+        if (folder.id === action.payload.id) {
+          folder.name = action.payload.name;
+        }
+        return folder;
+      });
+    },
   },
 });
 
@@ -73,7 +83,8 @@ export const {
   decNoteCountById,
   setFolderList,
   resetFolderList,
-  expulsionFolderById
+  expulsionFolderById,
+  editName,
 } = folder.actions;
 
 export const createNewFolder = (info) => (dispatch) => {
@@ -112,6 +123,21 @@ export const restoreFolder = (id) => (dispatch) => {
 
 export const expulsionFolder = (id) => (dispatch) => {
   dispatch(expulsionFolderById(id))
+}
+
+export const renameFolder = (id, newName) => (dispatch) => {
+  // fetch(`${serverApi}/sync/renameFolder`, {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify({ id: id, name: newName }),
+  // })
+  //   .then((res) => res.json())
+  //   .then((result) => {
+  //     console.log(result.mes);
+  //   });
+  dispatch(editName({id: id, name: newName}))
 }
 
 export default folder.reducer;
