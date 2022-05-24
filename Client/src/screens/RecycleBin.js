@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import { SwipeListView, SwipeRow } from "react-native-swipe-list-view";
 import moment from "moment";
 import "moment/locale/vi";
+import { useState } from "react";
+
 
 import SearchBar from "../components/SearchBar";
 import NoteListItem from "../components/NoteListItem";
@@ -36,6 +38,8 @@ function RecycleBin({
     navigation.goBack();
   };
 
+  const [textSearch, setTextSearch] = useState("");
+
   const handleRestoreNote = (note) => {
     // kiểm tra folder chứa nó bị xóa chưa, nếu rồi thì khôi phục folder đó
     const folder = folderList.filter(folder => folder.id === note.folderId)[0]
@@ -57,7 +61,8 @@ function RecycleBin({
         "một tháng trước"
     ) {
       handleExpulsionNote(data.item.id);
-    } else if (data.item.isDeleted) {
+    } else if (data.item.isDeleted && (data.item.title.toLowerCase().includes(textSearch.toLowerCase()) ||
+    data.item.content.toLowerCase().includes(textSearch.toLowerCase()))) {
       return (
         <SwipeRow
           rightOpenValue={-80}
@@ -89,7 +94,7 @@ function RecycleBin({
         Các ghi chú được giữ trong thùng rác trong vòng 1 tháng trước khi bị xóa vĩnh
         viễn
       </Text>
-      <SearchBar style={styles.searchBar} />
+      <SearchBar style={styles.searchBar} textSearch={textSearch} setTextSearch={setTextSearch} />
       <SwipeListView
         data={noteList}
         renderItem={renderItem}

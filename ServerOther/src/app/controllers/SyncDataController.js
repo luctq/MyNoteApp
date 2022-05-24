@@ -53,7 +53,7 @@ class SyncDataController {
                 if (err) return console.error(err);
                 console.log('Ảnh đã được lưu thành công')
               })
-              note.content = note.content.replace(regex1, `http://192.168.113.107:8080/images/${note.lastEdit}${i}.png`)
+              note.content = note.content.replace(regex1, `http://192.168.223.58:8080/images/${note.lastEdit}${i}.png`)
             }
             if (r.type === 'data:audio/mp4;base64,') {
               const regex1 = /data:audio\/mp4;base64,([+:/=;,A-Za-z\s0-9]+)/
@@ -61,7 +61,7 @@ class SyncDataController {
                 if (err) return console.error(err);
                 console.log('Ảnh đã được lưu thành công')
               })
-              note.content = note.content.replace(regex1, `http://192.168.113.107:8080/audios/${note.lastEdit}${i}.mp4`)
+              note.content = note.content.replace(regex1, `http://192.168.223.58:8080/audios/${note.lastEdit}${i}.mp4`)
             }
           }
           const newNote = await Note.create({
@@ -342,7 +342,7 @@ class SyncDataController {
               if (err) return console.error(err);
               console.log('File saved')
             })
-            note.content = note.content.replace(regex1, `http://192.168.113.107:8080/images/${note.lastEdit}${i}.png`)
+            note.content = note.content.replace(regex1, `http://192.168.223.58:8080/images/${note.lastEdit}${i}.png`)
           }
           if (r.type === 'data:audio/mp4;base64,') {
             const regex1 = /data:audio\/mp4;base64,([+:/=;,A-Za-z\s0-9]+)/
@@ -350,7 +350,7 @@ class SyncDataController {
               if (err) return console.error(err);
               console.log('File saved')
             })
-            note.content = note.content.replace(regex1, `http://192.168.113.107:8080/audios/${note.lastEdit}${i}.mp4`)
+            note.content = note.content.replace(regex1, `http://192.168.223.58:8080/audios/${note.lastEdit}${i}.mp4`)
           }
         }
         await Note.update({
